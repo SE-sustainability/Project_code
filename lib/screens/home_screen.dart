@@ -8,13 +8,13 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  List<Note> notes = []; // List to store notes
+  List<note> notes = []; // List to store notes
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Note Taking App'),
+        title: Text('Reminder App'),
       ),
       backgroundColor: Colors.lightGreen, // Set the background color
       body: ListView.builder(
