@@ -4,39 +4,85 @@ import 'note.dart'; // Import the Note class
 
 class HomeScreen extends StatefulWidget {
   @override
+  _HomeScreemState createState() => _HomeScreemState();
+}
+
+class _HomeScreemState extends State <HomeScreen> {
+
+  void settingsManager() {
+
+}
+
+void modeHandler() {
+
+}
+
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Reminders App'),
+        title: Text(
+            'Reminders App'
+        ),
+        actions: [
+          IconButton(
+              tooltip: 'Settings',
+              onPressed: (){
+                  settingsManager();
+              },
+              icon: const Icon(Icons.settings)
+          )
+        ],
       ),
       backgroundColor: Colors.lightGreen, // Set the background color
       body: GridView.count(
-        crossAxisCount: 2, // Number of columns in the grid
-        crossAxisSpacing: 16.0,
-        mainAxisSpacing: 16.0,
-        padding: EdgeInsets.all(16.0),
-        children: [
-          _buildModeCard("Home", Icons.home, Colors.blue),
-          _buildModeCard("Work", Icons.work, Colors.orange),
-          _buildModeCard("Holiday", Icons.beach_access, Colors.green),
-          _buildModeCard("Car", Icons.directions_car, Colors.red),
-          _buildModeCard("Plus", Icons.add, Colors.grey),
-        ],
-      ),
+          crossAxisCount: 2, // Number of columns in the grid
+          crossAxisSpacing: 16.0,
+          mainAxisSpacing: 16.0,
+          padding: EdgeInsets.all(16.0),
+          children: [
+            InkWell(
+              onTap: (){
+                modeHandler();
+              },
+              child: _buildModeCard("Home", Icons.home, Colors.blue),
+            ),
+            InkWell(
+              onTap: (){
+                modeHandler();
+              },
+              child: _buildModeCard("Work", Icons.work, Colors.orange),
+            ),
+            InkWell(
+              onTap: (){
+                modeHandler();
+              },
+              child: _buildModeCard("Holiday", Icons.beach_access, Colors.green),
+            ),
+            InkWell(
+              onTap: (){
+                modeHandler();
+              },
+              child: _buildModeCard("Car", Icons.directions_car, Colors.red),
+            ),
+
+
+
+          ],
+        ),
+
 
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-         // Handle adding a new reminder
+          // Handle adding a new reminder
           print("Adding a new reminder");
         },
-         child: Icon(Icons.add),(Icons.home), (Icons.work),(Icons.beach_access),(Icons.directions_car)
-
+        child: Icon(Icons.add),
       ),
     );
   }
 
 
-Widget _buildModeCard(String label, IconData icon, Color color) {
+  Widget _buildModeCard(String label, IconData icon, Color color) {
     return GestureDetector(
       onTap: () {
         // Handle mode selection here
