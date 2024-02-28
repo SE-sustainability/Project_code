@@ -36,7 +36,7 @@ class ReminderScreen extends StatelessWidget {
             TextField(
               maxLines: 4,
               decoration: InputDecoration(
-                labelText: 'Details',
+                labelText: 'Description',
                 border: OutlineInputBorder(),
               ),
             ),
@@ -48,12 +48,7 @@ class ReminderScreen extends StatelessWidget {
               child: Text('Add Note'),
             ),
             SizedBox(height: 16),
-            // Display existing notes (you can use a ListView or other widgets)
-            // Example:
-            // Text('Your existing notes:'),
-            // Text('1. Note 1'),
-            // Text('2. Note 2'),
-            // ...
+           
           ],
         ),
       ),
