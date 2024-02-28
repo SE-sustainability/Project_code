@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Reminder Screen',
       home: ReminderScreen(),
+      theme: ThemeData(
+        primaryColor: Colors.black,
+      ),
     );
   }
 }
@@ -19,7 +19,23 @@ class ReminderScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('New Reminder'),
+        leading: IconButton(
+          icon: Icon(Icons.cancel),
+          onPressed: () {},
+        ),
+        title: Text(
+          'New Reminder',
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: 20,
+          ),
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {},
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -28,35 +44,53 @@ class ReminderScreen extends StatelessWidget {
           children: [
             TextField(
               decoration: InputDecoration(
-                labelText: 'Title',
+                hintText: 'Title',
                 border: OutlineInputBorder(),
+                labelText: 'Title',
               ),
             ),
             SizedBox(height: 16),
             TextField(
-              maxLines: 4,
+              maxLines: 5,
               decoration: InputDecoration(
-                labelText: 'Description',
+                hintText: 'Notes',
                 border: OutlineInputBorder(),
+                labelText: 'Notes',
               ),
             ),
             SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () {
-                // Add functionality here to save the note
-              },
-              child: Text('Add Note'),
+            ListTile(
+              leading: Text(
+                'Reminder Options',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              trailing: Icon(Icons.arrow_forward_ios),
             ),
-            SizedBox(height: 16),
-           
+            ListTile(
+              leading: Text(
+                'Mode',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              trailing: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Reminders',
+                    style: TextStyle(
+                      color: Colors.green,
+                    ),
+                  ),
+                  Icon(Icons.arrow_forward_ios),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 }
-
-
-
-
-
