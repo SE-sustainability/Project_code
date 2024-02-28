@@ -29,7 +29,8 @@ class HomeScreen extends StatefulWidget {
          // Handle adding a new reminder
           print("Adding a new reminder");
         },
-        child: Icon(Icons.add),
+         child: Icon(Icons.add),(Icons.home), (Icons.work),(Icons.beach_access),(Icons.directions_car)
+
       ),
     );
   }
