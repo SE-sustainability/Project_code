@@ -1,0 +1,67 @@
+import 'package:flutter/material.dart';
+
+void main() {
+  runApp(MyApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Reminder Screen',
+      home: ReminderScreen(),
+    );
+  }
+}
+
+class ReminderScreen extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('New Reminder'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            TextField(
+              decoration: InputDecoration(
+                labelText: 'Title',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            TextField(
+              maxLines: 4,
+              decoration: InputDecoration(
+                labelText: 'Details',
+                border: OutlineInputBorder(),
+              ),
+            ),
+            SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () {
+                // Add functionality here to save the note
+              },
+              child: Text('Add Note'),
+            ),
+            SizedBox(height: 16),
+            // Display existing notes (you can use a ListView or other widgets)
+            // Example:
+            // Text('Your existing notes:'),
+            // Text('1. Note 1'),
+            // Text('2. Note 2'),
+            // ...
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+
+
+
+
