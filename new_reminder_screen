@@ -60,6 +60,43 @@ class ReminderScreen extends StatelessWidget {
             ),
             SizedBox(height: 16),
             ListTile(
+              leading: Icon(Icons.date_range), // Date icon
+              title: Text('Date'), // Date label
+              trailing: Icon(Icons.arrow_forward_ios), // Arrow icon
+              onTap: () {
+                // Handle date selection
+                //  open a calendar widget here
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.access_time), // Time icon
+              title: Text('Time'), // Time label
+              trailing: Icon(Icons.arrow_forward_ios), // Arrow icon
+              onTap: () {
+                // Handle time selection
+                // You can open a time picker here
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.location_on), // Location icon
+              title: Text('Location'), // Location label
+              trailing: Icon(Icons.arrow_forward_ios), // Arrow icon
+              onTap: () {
+                // Handle location selection
+                // You can open a map or location picker here
+              },
+            ),
+            ListTile(
+              leading: Icon(Icons.priority_high), // Priority icon
+              title: Text('Priority'), // Priority label
+              trailing: Icon(Icons.arrow_forward_ios), // Arrow icon
+              onTap: () {
+                // Handle priority selection
+                // You can show a dropdown or dialog for priority options
+              },
+            ),
+
+            ListTile(
               leading: Text(
                 'Reminder Options',
                 style: TextStyle(
