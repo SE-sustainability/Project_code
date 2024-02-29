@@ -63,9 +63,17 @@ class ReminderScreen extends StatelessWidget {
               leading: Icon(Icons.date_range), // Date icon
               title: Text('Date'), // Date label
               trailing: Icon(Icons.arrow_forward_ios), // Arrow icon
-              onTap: () {
+              onTap: () async {
                 // Handle date selection
-                //  open a calendar widget here
+                final selectedDate = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime(2000),
+                  lastDate: DateTime(2100),
+                );
+                if (selectedDate != null) {
+                  // Do something with the selected date
+                }
               },
             ),
             ListTile(
