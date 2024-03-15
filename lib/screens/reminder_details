@@ -16,7 +16,25 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class ReminderScreen extends StatelessWidget {
+class ReminderScreen extends StatefulWidget {
+  @override
+  _ReminderScreenState createState() => _ReminderScreenState();
+}
+
+class _ReminderScreenState extends State<ReminderScreen> {
+  XFile? _imageFile;
+
+  Future<void> _pickImage() async {
+    final ImagePicker _picker = ImagePicker();
+    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+
+    setState(() {
+      _imageFile = image;
+    });
+  }
+  
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
