@@ -1,0 +1,154 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_icons/flutter_icons.dart'; // Importing flutter icons
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+
+void main() {
+  runApp(reminderApp());
+}
+
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Reminder App',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+        visualDensity: VisualDensity.adaptivePlatformDensity,
+      ),
+      home: ReminderPage(),
+    );
+  }
+}
+
+class ReminderPage extends StatefulWidget {
+  @override
+  _ReminderPageState createState() => _ReminderPageState();
+}
+
+class _ReminderPageState extends State<ReminderPage> {
+  TextEditingController _descriptionController = TextEditingController();
+  IconData _selectedIcon = FlutterIcons.alarm_mco;
+  Color _selectedColor = colors.blue 
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Create Reminder'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            TextField(
+              controller: _descriptionController,
+              decoration: InputDecoration(
+                labelText: 'Description',
+              ),
+            ),
+            SizedBox(height: 20),
+            Text('Select Icon:', style: TextStyle(fontSize: 16)),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(
+                  icon: Icon(FlutterIcons.alarm_mco),
+                  onPressed: () {
+                    setState(() {
+                      _selectedIcon = FlutterIcons.alarm_mco;
+                    });
+                  },
+                ),
+                IconButton(
+                  icon: Icon(FlutterIcons.calendar_check_o_faw5),
+                  onPressed: () {
+                    setState(() {
+                      _selectedIcon = FlutterIcons.calendar_check_o_faw5;
+                    });
+                  },
+                ),
+              
+              ],
+            ),
+         ------- -picking colour   ------
+            SizedBox(height: 20),
+            Text('Select Color:', style: TextStyle(fontSize: 16)),
+            SizedBox(height: 10),
+
+            GestureDetector(
+              onTap: _pickColor,
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: _selectedColor,
+                  shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular (12.0),
+                 ),
+              ),
+            ),
+          ),
+            SizedBox(height: 20),
+            RaisedButton(
+              onPressed: _saveReminder,
+              child: Text('Save Reminder'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+--colour options 
+
+  void _pickColor() async {
+    Color selectedColor = await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Pick a Color'),
+          content: SingleChildScrollView(
+            child: BlockPicker(
+              pickerColor: _selectedColor,
+              onColorChanged: (Color color) {
+                setState(() {
+                  _selectedColor = color;
+                });
+              },
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('OK'),
+              onPressed: () {
+                Navigator.of(context).pop(_selectedColor);
+              },
+            ),
+          ],
+        );
+      },
+    );
+
+    if (selectedColor != null) {
+      setState(() {
+        _selectedColor = selectedColor;
+      });
+    }
+  }
+
+  void _saveReminder() {
+    // Save reminders logic 
+    String description = _descriptionController.text;
+    print('Description: $description');
+    print('Selected Icon: $_selectedIcon');
+    print('Selected Color: $_selectedColor');
+    // Implement more logic to save the reminder here
+  }
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
+}
+
