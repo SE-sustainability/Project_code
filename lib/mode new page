@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_icons/flutter_icons.dart'; // Importing flutter icons
+import 'package:flutter_icons/flutter_icons.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 void main() {
-  runApp(reminderApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
@@ -15,20 +15,20 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ReminderPage(),
+      home: ModePageOption(),
     );
   }
 }
 
-class ReminderPage extends StatefulWidget {
+class ModePageOption extends StatefulWidget {
   @override
-  _ReminderPageState createState() => _ReminderPageState();
+  _ModePageOptionState createState() => _ModePageOptionState();
 }
 
-class _ReminderPageState extends State<ReminderPage> {
+class _ModePageOptionState extends State<ModePageOption> {
   TextEditingController _descriptionController = TextEditingController();
   IconData _selectedIcon = FlutterIcons.alarm_mco;
-  Color _selectedColor = colors.blue 
+  Color _selectedColor = Colors.blue;
 
   @override
   Widget build(BuildContext context) {
@@ -68,14 +68,11 @@ class _ReminderPageState extends State<ReminderPage> {
                     });
                   },
                 ),
-              
               ],
             ),
-         ------- -picking colour   ------
             SizedBox(height: 20),
             Text('Select Color:', style: TextStyle(fontSize: 16)),
             SizedBox(height: 10),
-
             GestureDetector(
               onTap: _pickColor,
               child: Container(
@@ -83,12 +80,10 @@ class _ReminderPageState extends State<ReminderPage> {
                 height: 40,
                 decoration: BoxDecoration(
                   color: _selectedColor,
-                  shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular (12.0),
-                 ),
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
               ),
             ),
-          ),
             SizedBox(height: 20),
             RaisedButton(
               onPressed: _saveReminder,
@@ -99,7 +94,6 @@ class _ReminderPageState extends State<ReminderPage> {
       ),
     );
   }
---colour options 
 
   void _pickColor() async {
     Color selectedColor = await showDialog(
@@ -137,12 +131,10 @@ class _ReminderPageState extends State<ReminderPage> {
   }
 
   void _saveReminder() {
-    // Save reminders logic 
     String description = _descriptionController.text;
     print('Description: $description');
     print('Selected Icon: $_selectedIcon');
     print('Selected Color: $_selectedColor');
-    // Implement more logic to save the reminder here
   }
 
   @override
@@ -151,4 +143,3 @@ class _ReminderPageState extends State<ReminderPage> {
     super.dispose();
   }
 }
-
