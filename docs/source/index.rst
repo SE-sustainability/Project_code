@@ -1,4 +1,4 @@
-Welcome to Lumache's documentation!
+Reminders App - 3C
 ===================================
 
 **Lumache** (/lu'make/) is a Python library for cooks and food lovers
