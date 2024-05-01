@@ -31,7 +31,7 @@ For example:
 
 Below is the Main.dart file in full.
 
-.. code-block:: console
+.. code-block:: dart
 
 
    // import 'package:cloud_firestore/cloud_firestore.dart';
