@@ -32,6 +32,8 @@ For example:
 Below is the Main.dart file in full.
 
 .. code-block:: console
+
+
    // import 'package:cloud_firestore/cloud_firestore.dart';
    import 'package:flutter/material.dart';
    import 'screens/ModePage.dart';
