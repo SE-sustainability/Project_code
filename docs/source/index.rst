@@ -11,5 +11,8 @@ Lumache has its documentation hosted on Read the Docs.
 
 
 .. toctree::
-
+main
+screens
+services
+backend
    
