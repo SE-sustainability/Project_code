@@ -1,0 +1,28 @@
+import 'package:flutter/material.dart';
+import 'reminder.services';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+
+class ReminderProvider extends ChangeNotifier {
+  List<Reminder> _reminders = [];
+
+  List<Reminder> get reminders => _reminders;
+
+  void addReminder(Reminder reminder) {
+    _reminders.add(reminder);
+    notifyListeners();
+  }
+
+  void updateReminder(String reminderId, Reminder reminder) {
+    final index = _reminders.indexWhere((r) => reminder.id == reminderId);
+    if (index != -1) {
+      _reminders[index] = reminder;
+      notifyListeners();
+    }
+  }
+
+  void deleteReminder(String reminderId) {
+    _reminders.removeWhere((r) => r.id == reminderId);
+    notifyListeners();
+  }
+}
