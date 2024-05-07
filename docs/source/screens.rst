@@ -8,7 +8,11 @@ Mode Page
 ------------
 The first page which is opened when the app is Run is the *"Mode Page"* This page allows the user to choose which mode the reminders are in. When the app is launched for the first time there will be no options for modes that you can have. To add a reminder mode, you will have to click the widget in the bottom right of the screen which resembles a plus in a circle which will direct the user to the "Mode Page Options", allowing the user to create a mode which will be accessible on the "Mode Page". When Modes Have been created there will be the modes show up on the "Mode Page" as clickable widgets, when clicked it will take to the user to the unique reminders page. 
 
+**Widgets**
+There are 2 types of widgets within the 
 
+
+Below is the full code for "ModePage.dart"
 .. code-block:: dart
 
    import 'package:flutter/material.dart';
