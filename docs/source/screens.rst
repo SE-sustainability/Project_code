@@ -13,6 +13,7 @@ The first page which is opened when the app is Run is the *"Mode Page"* This pag
 There are 2 interactave widgets within the Mode Page. The Options widget and the modes widgets. 
 
 ``Options Widget``
+
 The Options Widget appears the same for every user, no matter the number of mode widgets there are. This makes it hard-coded into the app, making the code that creates it more simple. 
 
 
