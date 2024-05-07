@@ -1,33 +1,7 @@
 Main
 =======
 
-The Main File is code that is only used to Launch the app and configure a few settings. On the app its used to Launch our 'Home Page' which is the 'Mode Page'. This allows users to choose a mode for the reminders or create a new mode. 
-
-.. code-block:: console
-
-   put some code here <3
-
-
-Creating recipes
-----------------
-
-To retrieve a list of random ingredients,
-you can use the ``lumache.get_random_ingredients()`` function:
-
-.. autofunction:: lumache.get_random_ingredients
-
-The ``kind`` parameter should be either ``"meat"``, ``"fish"``,
-or ``"veggies"``. Otherwise, :py:func:`lumache.get_random_ingredients`
-will raise an exception.
-
-.. autoexception:: lumache.InvalidKindError
-
-For example:
-
->>> import lumache
->>> lumache.get_random_ingredients()
-['shells', 'gorgonzola', 'parsley']
-
+The Main File is code that is only used to Launch the app and configure a few settings. On the app its used to Launch our 'Home Page' which is the 'Mode Page'. This allows users to choose a mode for the reminders or create a new mode.
 
 Below is the Main.dart file in full.
 
