@@ -39,7 +39,11 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
   }
 
   Future<void> _addReminder() async {
-    Reminder newReminder = Reminder(title: 'New Reminder', completed: false);
+    Reminder newReminder = Reminder(
+        title: 'New Reminder',
+        completed: false,
+        description: 'Description',
+        dateTime: Timestamp.now());
     String reminderId = await _databaseService.addReminder(newReminder);
 
     // Navigator.push(
@@ -114,6 +118,17 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                         reminders[index].id; //Get id of reminder
                     // print(reminderId);'#;
                     // print(reminder);
+                    if (reminder.title == null || reminder.title.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 10,
+                        ),
+                        child: ListTile(
+                          title: Text("Error: Reminder has no title"),
+                        ),
+                      );
+                    }
                     return Padding(
                       padding: const EdgeInsets.symmetric(
                         vertical: 10,
@@ -143,13 +158,26 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
                           ],
                         ),
                         onLongPress: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => ReminderScreen(
-                                    reminderId: reminderId,
-                                    title: reminder.title)),
-                          );
+                          FirebaseFirestore.instance
+                              .collection('reminders')
+                              .doc(reminderId)
+                              .get()
+                              .then((DocumentSnapshot documentSnapshot) {
+                            if (documentSnapshot.exists) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ReminderScreen(
+                                        reminderId: documentSnapshot.id,
+                                        title: documentSnapshot['title'],
+                                        description:
+                                            documentSnapshot['description'])),
+                              );
+                            } else {
+                              print('Document does not exist');
+                            }
+                            ;
+                          });
                         }, // navigate to reminder options to update current reminder
                       ),
                     );
@@ -157,4 +185,3 @@ class _CreateNoteScreenState extends State<CreateNoteScreen> {
             }));
   }
 }
-
