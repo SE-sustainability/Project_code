@@ -21,14 +21,14 @@ The first page which is opened when the app is Run is the *"Mode Page"* This pag
      @override
      _ModePageState createState() => _ModePageState();
    }
-   
+      
    class _ModePageState extends State<ModePage> {
      final List<Mode> modes = [];
       
      void modeHandler(int mode_id) {
        print("Selected mode: $mode_id");
   }
-
+   
      @override
      void initState() {
        super.initState();
