@@ -14,8 +14,8 @@ The first page which is opened when the app is Run is the *"Mode Page"* This pag
    import 'package:flutter/material.dart';
    import 'RemindersPage.dart';
    import 'ModePageOptions.dart';
-   
-   
+      
+         
    class ModePage extends StatefulWidget {
      //Add connection property
      @override
@@ -24,7 +24,7 @@ The first page which is opened when the app is Run is the *"Mode Page"* This pag
    
    class _ModePageState extends State<ModePage> {
      final List<Mode> modes = [];
-   
+      
      void modeHandler(int mode_id) {
        print("Selected mode: $mode_id");
   }
