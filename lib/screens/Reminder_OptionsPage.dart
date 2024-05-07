@@ -42,13 +42,45 @@ class _ReminderScreenState extends State<ReminderScreen> {
   XFile? _imageFile;
   DateTime? _dateTime;
 
-  Future<void> _pickImage() async {
+   Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.camera);
+    final XFile? image = await showDialog<XFile>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Choose an option'),
+          content: const Text('Select an image source'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Gallery'),
+              onPressed: () async {
+                final XFile? galleryImage =
+                await _picker.pickImage(source: ImageSource.gallery);
+                if (galleryImage != null) {
+                  Navigator.of(context).pop(galleryImage);
+                }
+              },
+            ),
+            TextButton(
+              child: const Text('Camera'),
+              onPressed: () async {
+                final XFile? cameraImage =
+                await _picker.pickImage(source: ImageSource.camera);
+                if (cameraImage != null) {
+                  Navigator.of(context).pop(cameraImage);
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
 
-    setState(() {
-      _imageFile = image;
-    });
+    if (image != null) {
+      setState(() {
+        _imageFile = image;
+      });
+    }
   }
 
   Future<Map<String, dynamic>> _loadReminderOptions(
