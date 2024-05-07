@@ -13,6 +13,7 @@ There are 2 types of widgets within the
 
 
 Below is the full code for "ModePage.dart"
+
 .. code-block:: dart
 
    import 'package:flutter/material.dart';
