@@ -6,15 +6,15 @@ There are 5 different files for each of the 5 different screens within our app; 
 
 Mode Page
 ------------
-The first page which is opened when the app is Run is the *"Mode Page"* This page allows the user to choose which mode the reminders are in. When the app is launched for the first time there will be no options for modes that you can have. To add a reminder mode, you will have to click the widget in the bottom right of the screen which resembles a plus in a circle which will direct the user to the "Mode Page Options", allowing the user to create a mode which will be accessible on the "Mode Page". When Modes Have been created there will be the modes show up on the "Mode Page" as clickable widgets, when clicked it will take to the user to the unique reminders page. 
+The first page which is opened when the app is Run is the "Mode Page" This page allows the user to choose which mode the reminders are in. When the app is launched for the first time there will be no options for modes that you can have. To add a reminder mode, you will have to click the widget in the bottom right of the screen which resembles a plus in a circle which will direct the user to the "Mode Page Options", allowing the user to create a mode which will be accessible on the "Mode Page". When Modes Have been created there will be the modes show up on the "Mode Page" as clickable widgets, when clicked it will take to the user to the unique reminders page. 
 
 **Interactive Widgets**
 
-There are 2 interactave widgets within the Mode Page. The Options widget and the modes widgets. 
+There are interactive widgets within the Mode Page. The Options widget, the modes widgets and the general settings for the app.
 
-``Options Widget``
+*Options Widget and Settings Widget*
 
-The Options Widget is one of the 2 possible types of interactive widgets on this page. This widget will appear the same for all users, it allows the user to go to the mode options page, and edit the modes found within the mode page such as add, edit or delete.
+Both of these widgets are hard coded into the app, however, they do different things. The Options Widget is one of the 2 possible types of interactive widgets on this page. This widget will appear the same for all users, it allows the user to go to the mode options page, and edit the modes found within the mode page such as add, edit or delete. The settings witdget resembles a cog in the top right corner, it will open up the settings page, allowing the user to 
 
 
 Below is the full code for "ModePage.dart"
