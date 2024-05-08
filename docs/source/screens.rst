@@ -14,7 +14,7 @@ There are 2 interactave widgets within the Mode Page. The Options widget and the
 
 ``Options Widget``
 
-The Options Widget appears the same for every user, no matter the number of mode widgets there are. This makes it hard-coded into the app, making the code that creates it more simple. 
+The Options Widget is one of the 2 possible types of interactive widgets on this page. This widget will appear the same for all users, it allows the user to go to the mode options page, and edit the modes found within the mode page such as add, edit or delete.
 
 
 Below is the full code for "ModePage.dart"
