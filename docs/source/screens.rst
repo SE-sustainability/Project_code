@@ -14,7 +14,78 @@ There are interactive widgets within the Mode Page. The Options widget, the mode
 
 *Options Widget and Settings Widget*
 
-Both of these widgets are hard coded into the app, however, they do different things. The Options Widget is one of the 2 possible types of interactive widgets on this page. This widget will appear the same for all users, it allows the user to go to the mode options page, and edit the modes found within the mode page such as add, edit or delete. The settings witdget resembles a cog in the top right corner, it will open up the settings page, allowing the user to 
+Both of these widgets are hard-coded into the app, however, they do different things. The Options Widget is one of the 2 possible types of interactive widgets on this page. This widget will appear the same for all users, it allows the user to go to the mode options page, and edit the modes found within the mode page such as add, edit or delete. The settings widget resembles a cog in the top right corner, it will open up the settings page, allowing the user to change the appearance of the app.
+
+*Mode Widgets*
+These widgets are all customised by the user which will appear very different to different users. When each mode is clicked the app will navigate to the specific mode reminders. The app does this by looking into a database to find the modes which have been stored, and how the user has decided how it looks, It then will sort them into 2 column rows. Below is the code for the mode widgets specifically. The modes are stored in a database with the mode id as the primary ID, which is also used as a foreign key for reminders, it will go down the foreign keys and for each mode use "mode.description" for the name of the mode, "mode.color" for the colour of the widget and "mode.icon" for the icon within the widget. //is mode.icon a foreign key??// In the bottom right of the widget there is an edit button, which takes users to a page allowing them to edit the details of the mode.
+
+.. code-block:: dart
+
+     Widmodeget _buildModeCard(Mode mode) {
+       return GestureDetector(
+         onTap: () {
+           // Handle mode selection here
+           _navigateToReminderPage();
+           // modeHandler(mode.id);
+           print("Selected mode: ${mode.description}");
+         },
+         child: Card(
+           color: mode.color,
+           shape: RoundedRectangleBorder(
+             borderRadius: BorderRadius.circular(12.0),
+           ),
+           elevation: 4.0,
+           child: Stack(
+             children: [
+               Center(
+               child : Column(
+               mainAxisAlignment: MainAxisAlignment.center,
+               children: [
+                 Icon(
+                   mode.icon,
+                   size: 40.0,
+                   color: Colors.white,
+                 ),
+                 const SizedBox(height: 8.0),
+                 Text(
+                   mode.description,
+                   style: const TextStyle(
+                     color: Colors.white,
+                     fontWeight: FontWeight.bold,
+                   ),
+                 ),
+               ],
+             ),
+             ),
+             Align(
+               alignment: Alignment.bottomRight,
+               child: Row(
+                 mainAxisAlignment: MainAxisAlignment.end,
+                 children: [
+                   IconButton(
+                     icon: const Icon(Icons.edit),
+                     onPressed: () {
+                       // Navigate to edit page
+                       _navigateToEditMode(mode);
+                     },
+                   ),
+                   IconButton(
+                     icon: const Icon(Icons.delete),
+                     onPressed: () {
+                       // Delete mode
+                       _deleteMode(mode);
+                     },
+                   ),
+                 ],
+               ),
+             ),
+             ],
+           ),
+         ),
+       );
+      }
+     }
+
 
 
 Below is the full code for "ModePage.dart"
