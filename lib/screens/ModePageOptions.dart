@@ -57,7 +57,7 @@ class _ModePageOptionState extends State<ModePageOptions> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Create Reminder'),
+        title: const Text('Create Mode'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
