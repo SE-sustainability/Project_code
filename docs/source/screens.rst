@@ -47,7 +47,7 @@ Below is the code for the Mode Options widget:
 
 *Mode Widgets*
 
-The widgets which are created within the mode widget will appear different to every user as they are customised to how the user has added them.  When each mode is clicked the app will navigate to the specific mode page which will have the reminders for that mode. This is achieved by the app retrieving the mode settings from the database based on the user's preferences. The modes are sorted into this database with :samp:`mode.id` as the primary key, which is also used as a foreign key for reminders to associate them with a mode. The name of the mode is stored under :samp:`mode.description`. The rest of the columns within the database are associated with the appearance of the widget for the mode: :samp:`mode.color` for the colour and `mode.icon` for the icon. In the bottom right of the widget there is an edit button, which takes users to a page to edit the details of the mode. Next to the edit icon, there is a delete icon which will delete the mode by deleting the row in the database so it will no longer show up for the users. This widget is the most code-heavy and difficult to implement.
+The widgets which are created within the mode widget will appear different to every user as they are customised to how the user has added them.  When each mode is clicked the app will navigate to the specific mode page which will have the reminders for that mode. This is achieved by the app retrieving the mode settings from the database based on the user's preferences. The modes are sorted into this database with :samp:`mode.id` as the primary key, which is also used as a foreign key for reminders to associate them with a mode. The name of the mode is stored under :samp:`mode.description`. The rest of the columns within the database are associated with the appearance of the widget for the mode: :samp:`mode.color` for the colour and :samp:`mode.icon` for the icon. In the bottom right of the widget there is an edit button, which takes users to a page to edit the details of the mode. Next to the edit icon, there is a delete icon which will delete the mode by deleting the row in the database so it will no longer show up for the users. This widget is the most code-heavy and difficult to implement.
 
 
 The code which takes the user to the specific mode using the mode's id:
@@ -355,7 +355,18 @@ Below is the full code for "ModePage.dart"
 
 Settings Screen
 ---------------
-Once The user has clicked the settings icon the app will take the user to the settings page, which allows the appereance of the app. The user can change the size of the font and the background of the app When the user fir
+Once The user has clicked the settings icon the app will take the user to the settings page, which allows the user to change the appereance of the app. The user can change the size of the font and the theme (background and font colour) of the app, which will change accross the app. This is done by updating a database, allowing the change to implemented univesially throughout the app. The specific customiseation was done as it allows accessibility; changing the font size allows people who have poor eyesight to more easily read the app and therefore have an easier time navigating our app, and allowing users to change the theme (which is a diffrent background colour and the font colour changing to a contarsting colour) allows people who have visual stress or learning disibilites such as dyslexia have an easier time reading as white can be a very harsh background colour. The defult setting for the app is the theme being white (white background and black font) with size 20 font.
+
+*Theme Widget*
+
+The theme within our app is selected by a dropdown menu, allowing the users to choose from the preselected list of themes. The themes are stored within :samp:`_items` list, allowing easier impimenation of new themes in the future  The list of the current themes are: white, grey, green, blue and yellow. A new theme is 
+
+*Font Widget*
+
+*Storing app settings*
+
+*Implemnation accross the app*
+
 
 Creating recipes
 ----------------
