@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'RemindersPage.dart';
 import 'ModePageOptions.dart';
-// import 'package:firebase_core/firebase_core.dart';
-// import 'package:coursework_project/screens/ModePageOptions.dart';
-// import 'firebase_options.dart';
-// import 'package:firebase_analytics/firebase_analytics.dart'
-// import 'Backend/modes.dart';
-// import 'note.dart'; // Import the Note class
+import 'package:coursework_project/screens/Backend/modes.dart';
+import 'package:coursework_project/services/mode_services.dart';
+import 'settings_screen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 
 class ModePage extends StatefulWidget {
@@ -17,15 +15,41 @@ class ModePage extends StatefulWidget {
 
 class _ModePageState extends State<ModePage> {
   final List<Mode> modes = [];
+  final ModeService _modeService = ModeService();
 
-  void modeHandler(int mode_id) {
-    print("Selected mode: $mode_id");
-  }
+  String? _backgroundColor;
+  double? _fontSize;
 
   @override
   void initState() {
     super.initState();
+    _fetchModes();
+    _listenToSettingsChanges();
   }
+
+
+  void _listenToSettingsChanges() {
+    FirebaseFirestore.instance
+        .collection('settings')
+        .doc('lglhw4pN0FNw9LaOiVqX')
+        .snapshots()
+        .listen((settingsData) {
+      setState(() {
+        _backgroundColor = settingsData['colour'];
+        _fontSize = settingsData['font_Size']?.toDouble();
+      });
+    });
+  }
+
+  Future<void> _fetchModes() async {
+
+    List<Mode> fetchedModes = await _modeService.getModes();
+    setState(() {
+      modes.addAll(fetchedModes);
+    });
+  }
+
+
   Future<void> _navigateToModeOption({Mode? modeToEdit}) async {
     final editedMode = await Navigator.push<Mode?>(
       context,
@@ -61,7 +85,7 @@ class _ModePageState extends State<ModePage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-          builder: (context) => const CreateNoteScreen()), //mode_id: mode_id),
+          builder: (context) =>   CreateNoteScreen()), //mode_id: mode_id),
     );
   }
 
@@ -70,6 +94,7 @@ class _ModePageState extends State<ModePage> {
       modes.remove(mode);
     });
   }
+
 
   void _navigateToEditMode(Mode mode) async {
     Mode? editedMode = await Navigator.push<Mode>(
@@ -81,40 +106,55 @@ class _ModePageState extends State<ModePage> {
 
     if (editedMode != null) {
       setState(() {
-        // Find the index of the mode being edited and update it with the edited mode
-        int index = modes.indexWhere((m) => m == mode);
+        int index = modes.indexWhere((m) => m.id == mode.id);
         if (index != -1) {
-          modes[index] = editedMode;
+          modes[index] = editedMode.copyWith(id: mode.id); // Ensure the mode ID is preserved
+          _modeService.updateMode(mode.id, editedMode.copyWith(id: mode.id));
         }
       });
     }
   }
-
   bool _validateModeData(Mode mode) {
     return mode.description.isNotEmpty;
   }
 
+
+
   @override
   Widget build(BuildContext context) {
+    Color backgroundColor = _backgroundColor != null
+        ? getBackgroundColor(_backgroundColor!)
+        : Colors.blueGrey;
+
+    double fontSize = _fontSize ?? 16.0;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Reminders App'),
+        title:  Text(
+            'Reminders App',
+            style: TextStyle(fontSize: fontSize),
+        ),
         actions: [
           IconButton(
             tooltip: 'Settings',
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) =>  CreateSettingsScreen()),
+              );
+            },
             icon: const Icon(Icons.settings),
           ),
         ],
       ),
-      backgroundColor: Colors.blueGrey,
-      body: GridView.count(
+      backgroundColor: backgroundColor,
+      body:GridView.count(
         crossAxisCount: 2,
         crossAxisSpacing: 16.0,
         mainAxisSpacing: 16.0,
         padding: const EdgeInsets.all(16.0),
         children: modes.map((mode) {
-          return _buildModeCard(mode); // Use _buildModeCard with Mode object
+          return _buildModeCard(mode,fontSize); // Use _buildModeCard with Mode object
         }).toList(),
       ),
       floatingActionButton: FloatingActionButton(
@@ -126,7 +166,7 @@ class _ModePageState extends State<ModePage> {
     );
   }
 
-  Widget _buildModeCard(Mode mode) {
+  Widget _buildModeCard(Mode mode,double fontSize) {
     return GestureDetector(
       onTap: () {
         // Handle mode selection here
@@ -143,50 +183,104 @@ class _ModePageState extends State<ModePage> {
         child: Stack(
           children: [
             Center(
-            child : Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(
-                mode.icon,
-                size: 40.0,
-                color: Colors.white,
+              child : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    mode.icon,
+                    size: 40.0,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    mode.description,
+                    style:  TextStyle(
+                      color: Colors.white,
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: 8.0),
-              Text(
-                mode.description,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-          ),
-          Align(
-            alignment: Alignment.bottomRight,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () {
-                    // Navigate to edit page
-                    _navigateToEditMode(mode);
-                  },
-                ),
-                IconButton(
-                  icon: const Icon(Icons.delete),
-                  onPressed: () {
-                    // Delete mode
-                    _deleteMode(mode);
-                  },
-                ),
-              ],
             ),
-          ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      // Navigate to edit page
+                      _navigateToEditMode(mode);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      // Delete mode
+                      _deleteMode(mode);
+                    },
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
     );
-   }
   }
+  Color getBackgroundColor(String color) {
+    switch (color) {
+      case "white":
+        return Colors.white;
+      case "grey":
+        return Colors.grey;
+      case "green":
+        return Colors.green;
+      case "blue":
+        return Colors.blue;
+      case "yellow":
+        return Colors.yellow;
+      default:
+        return Colors.blueGrey;
+    }
+  }
+  // Color getBackgroundColor(String color) {
+  //   switch (color) {
+  //     case "white":
+  //       return Colors.white;
+  //     case "black":
+  //       return Colors.black;
+  //     case "red":
+  //       return Colors.red;
+  //     case "green":
+  //       return Colors.green;
+  //     case "blue":
+  //       return Colors.blue;
+  //     case "yellow":
+  //       return Colors.yellow;
+  //     case "orange":
+  //       return Colors.orange;
+  //     case "pink":
+  //       return Colors.pink;
+  //     case "purple":
+  //       return Colors.purple;
+  //     case "teal":
+  //       return Colors.teal;
+  //     case "cyan":
+  //       return Colors.cyan;
+  //     case "brown":
+  //       return Colors.brown;
+  //     case "grey":
+  //       return Colors.black87;
+  //     case "blueGrey":
+  //       return Colors.blueGrey;
+  //     default:
+  //       return Colors.yellow;
+  //   }
+  // }
+}
+
+
+
