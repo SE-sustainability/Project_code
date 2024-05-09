@@ -44,7 +44,7 @@ Below is the code for the Mode Options widget:
           },
        child: const Icon(Icons.add),
         ),
-      );
+      
 
 
 *Mode Widgets*
