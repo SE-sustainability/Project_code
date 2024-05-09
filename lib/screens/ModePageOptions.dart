@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:coursework_project/screens/Backend/modes.dart';
+import 'package:coursework_project/services/mode_services.dart';
+import 'package:uuid/uuid.dart';
 
-class Mode {
-  String description;
-  IconData icon;
-  Color color;
-
-  Mode({required this.description, required this.icon, required this.color});
-}
 
 class ModePageOptions extends StatefulWidget {
   final Mode? mode;
@@ -18,6 +14,8 @@ class ModePageOptions extends StatefulWidget {
 }
 
 class _ModePageOptionState extends State<ModePageOptions> {
+  final ModeService _modeService = ModeService();
+
   final TextEditingController _descriptionController = TextEditingController();
   IconData _selectedIcon = Icons.alarm;
   Color _selectedColor = Colors.blue;
@@ -29,6 +27,30 @@ class _ModePageOptionState extends State<ModePageOptions> {
       _selectedIcon = widget.mode!.icon;
       _selectedColor = widget.mode!.color;
     }
+  }
+
+  void _saveMode() {
+    String description = _descriptionController.text;
+    Mode updatedMode = Mode(
+        id: widget.mode != null ? widget.mode!.id : Uuid().v4(),
+        description: description,
+        icon: _selectedIcon,
+        color: _selectedColor);
+    if (widget.mode != null) {
+      // Update existing mode
+      _modeService.updateMode(widget.mode!.id, updatedMode);
+    } else {
+      // Create new mode
+      _modeService.addMode(updatedMode);
+    }
+    Navigator.pop(context, updatedMode);
+  }
+
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,12 +75,13 @@ class _ModePageOptionState extends State<ModePageOptions> {
                 style:
                 TextStyle(fontSize: 20)
             ),
-                IconButton(
-                  icon: Icon(_selectedIcon),
-                  onPressed: () { _pickIcon(context);
-                    },
-                    iconSize: 40
-                ),
+            IconButton(
+                icon: Icon(_selectedIcon),
+                onPressed: () {
+                  _pickIcon(context);
+                },
+                iconSize: 40
+            ),
             const SizedBox(height: 20),
             const Text('Select Color:',
                 style:
@@ -81,7 +104,7 @@ class _ModePageOptionState extends State<ModePageOptions> {
             ),
             const SizedBox(height: 50),
             TextButton(
-              onPressed: _saveReminder,
+              onPressed: _saveMode,
               child: const Text('Save Mode',
                 style: TextStyle(
                   fontSize: 20,
@@ -162,7 +185,10 @@ class _ModePageOptionState extends State<ModePageOptions> {
     return SingleChildScrollView(
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height  * 0.8// Adjust the height as needed
+            maxHeight: MediaQuery
+                .of(context)
+                .size
+                .height * 0.8 // Adjust the height as needed
         ),
         child: GridView.builder(
           shrinkWrap: true,
@@ -254,45 +280,38 @@ class _ModePageOptionState extends State<ModePageOptions> {
     return SingleChildScrollView(
       child: ConstrainedBox(
         constraints: BoxConstraints(
-          maxHeight: MediaQuery.of(context).size.height * 0.7, // Adjust the height as needed
+          maxHeight: MediaQuery
+              .of(context)
+              .size
+              .height * 0.7, // Adjust the height as needed
         ),
-      child:  GridView.builder(
-       shrinkWrap: true,
-       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-         crossAxisCount: 5,
-      ),
-       itemCount: colors.length,
-       itemBuilder: (BuildContext context, int index) {
-        // Use the Color at the current index
-        Color color = colors[index];
-        return GestureDetector(
-          onTap: () {
-            setState(() {
-              _selectedColor = color; // Update the selected color
-            });
-            Navigator.of(context).pop(); // Close the dialog
-          },
-          child: Container(
-            width: 50,
-            height: 50,
-            color: color,
+        child: GridView.builder(
+          shrinkWrap: true,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 5,
           ),
-        );
-      },
-    ),
-    ),
+          itemCount: colors.length,
+          itemBuilder: (BuildContext context, int index) {
+            // Use the Color at the current index
+            Color color = colors[index];
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedColor = color; // Update the selected color
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Container(
+                width: 50,
+                height: 50,
+                color: color,
+              ),
+            );
+          },
+        ),
+      ),
     );
-  }
+  }}
 
-  void _saveReminder() {
-    String description = _descriptionController.text;
-    Mode updatedMode = Mode(description: description, icon: _selectedIcon, color: _selectedColor);
-    Navigator.pop(context, updatedMode);
-  }
 
-  @override
-  void dispose() {
-    _descriptionController.dispose();
-    super.dispose();
-  }
-}
+
