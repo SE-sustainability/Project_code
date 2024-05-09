@@ -88,7 +88,7 @@ Code for the Specific Edit and delete widgets which are found in the bottom righ
                 ),
             ],
         ),
-    )
+    ),
 
 Full block of code for the mode widget:
 
