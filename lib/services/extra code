@@ -1,0 +1,591 @@
+//mode.dart
+import 'package:flutter/material.dart';
+class Mode {
+  final String id;
+  final String description;
+  final IconData icon;
+  final Color color;
+
+  Mode({required this.id,required this.description, required this.icon, required this.color});
+
+  Mode.fromJson(Map<String, dynamic> json)
+      : id = json['id'] as String,
+        description = json['description'] as String,
+        icon = IconData(int.parse(json['icon'] as String), fontFamily: 'MaterialIcons'), // Convert icon code to IconData
+        color = Color(int.parse(json['color'] as String)
+        );
+
+  Mode copyWith({
+    String? id,
+    String? description,
+    IconData? icon,
+    Color? color,
+  }) {
+    return Mode(
+      id: id ?? this.id,
+      description: description ?? this.description,
+      icon: icon?? this.icon,
+      color: color?? this.color,
+
+    );
+  }
+  Map<String, dynamic> toJson() {
+    return {
+      'id' : id,
+      'description' : description,
+      'icon' : '${icon.codePoint}',
+      'color' : '${color.value}',
+    };
+  }
+}
+//modepage.dart
+import 'package:flutter/material.dart';
+import 'RemindersPage.dart';
+import 'ModePageOptions.dart';
+import 'package:coursework_project/screens/Backend/modes.dart';
+import 'package:coursework_project/services/mode_services.dart';
+
+
+
+class ModePage extends StatefulWidget {
+  //Add connection property
+  @override
+  _ModePageState createState() => _ModePageState();
+}
+
+class _ModePageState extends State<ModePage> {
+  final List<Mode> modes = [];
+  final ModeService _modeService = ModeService();
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchModes();
+  }
+
+  Future<void> _fetchModes() async {
+
+    List<Mode> fetchedModes = await _modeService.getModes();
+    setState(() {
+      modes.addAll(fetchedModes);
+    });
+  }
+
+  Future<void> _navigateToModeOption({Mode? modeToEdit}) async {
+    final editedMode = await Navigator.push<Mode?>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ModePageOptions(mode: modeToEdit),
+      ),
+    );
+
+    if (editedMode != null) {
+      if (modeToEdit != null) {
+        final index = modes.indexWhere((mode) => mode == modeToEdit);
+        if (index != -1) {
+          setState(() {
+            modes[index] = editedMode;
+          });
+        }
+      } else {
+        if (_validateModeData(editedMode)) {
+          setState(() {
+            modes.add(editedMode);
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Please provide all mode details.'),
+            ),
+          );
+        }
+      }
+    }
+  }
+  void _navigateToReminderPage() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+          builder: (context) =>  CreateNoteScreen()), //mode_id: mode_id),
+    );
+  }
+
+  void _deleteMode(Mode mode) {
+    setState(() {
+      modes.remove(mode);
+    });
+  }
+
+  void _navigateToEditMode(Mode mode) async {
+    Mode? editedMode = await Navigator.push<Mode>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ModePageOptions(mode: mode),
+      ),
+    );
+
+    if (editedMode != null) {
+      setState(() {
+        if (mode.id.isNotEmpty) {
+          editedMode = editedMode?.copyWith(id: mode.id);
+          int index = modes.indexWhere((m) => m.id == mode.id);
+          if (index != -1) {
+            modes[index] = editedMode!;
+          }
+          _modeService.updateMode(mode.id, editedMode!);
+        }
+      });
+    }
+  }
+
+  bool _validateModeData(Mode mode) {
+    return mode.description.isNotEmpty;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Reminders App'),
+        actions: [
+          IconButton(
+            tooltip: 'Settings',
+            onPressed: () {},
+            icon: const Icon(Icons.settings),
+          ),
+        ],
+      ),
+      backgroundColor: Colors.blueGrey,
+      body: GridView.count(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16.0,
+        mainAxisSpacing: 16.0,
+        padding: const EdgeInsets.all(16.0),
+        children: modes.map((mode) {
+          return _buildModeCard(mode); // Use _buildModeCard with Mode object
+        }).toList(),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          _navigateToModeOption();
+        },
+        child: const Icon(Icons.add),
+      ),
+    );
+  }
+
+  Widget _buildModeCard(Mode mode) {
+    return GestureDetector(
+      onTap: () {
+        // Handle mode selection here
+        _navigateToReminderPage();
+        // modeHandler(mode.id);
+        print("Selected mode: ${mode.description}");
+      },
+      child: Card(
+        color: mode.color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        elevation: 4.0,
+        child: Stack(
+          children: [
+            Center(
+              child : Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    mode.icon,
+                    size: 40.0,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    mode.description,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      // Navigate to edit page
+                      _navigateToEditMode(mode);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      // Delete mode
+                      _deleteMode(mode);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+//mode_services:
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:coursework_project/screens/Backend/modes.dart';
+
+const String Mode_Collection_Ref = "modes";
+
+class ModeService {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  late CollectionReference _modesRef = FirebaseFirestore.instance.collection('modes');
+
+
+  ModeService() {
+    _modesRef = _firestore.collection(Mode_Collection_Ref).withConverter<Mode>(
+        fromFirestore: (snapshot, _) => Mode.fromJson(snapshot.data()!),
+        toFirestore: (mode, _) => mode.toJson());
+  }
+
+  Future<List<Mode>> getModes() async {
+    QuerySnapshot querySnapshot = await _firestore.collection('modes').get();
+    List<Mode> modes = querySnapshot.docs.map((doc) => Mode.fromJson(doc.data() as Map<String, dynamic>)).toList();
+    return modes;
+  }
+  // Add mode to database
+  void addMode(Mode mode) async {
+    _modesRef.add(mode);
+  }
+
+  // Update mode
+
+  Future<void> updateMode(String modeId, Mode updatedMode) async {
+    await _firestore.collection('modes').doc(modeId).set(updatedMode.toJson());
+  }
+
+
+  // Delete mode
+  void deleteMode(String modeId) {
+    _modesRef.doc(modeId).delete();
+  }
+
+  // Navigate to mode options page
+  void navigateToModeOptions(String modeId) {
+    // You can implement navigation logic here
+  }
+}
+//modeoptionspage:
+import 'package:flutter/material.dart';
+import 'package:coursework_project/screens/Backend/modes.dart';
+import 'package:coursework_project/services/mode_services.dart';
+import 'package:uuid/uuid.dart';
+
+
+class ModePageOptions extends StatefulWidget {
+  final Mode? mode;
+
+  ModePageOptions({required this.mode});
+
+  @override
+  _ModePageOptionState createState() => _ModePageOptionState();
+}
+
+class _ModePageOptionState extends State<ModePageOptions> {
+  final ModeService _modeService = ModeService();
+
+  final TextEditingController _descriptionController = TextEditingController();
+  IconData _selectedIcon = Icons.alarm;
+  Color _selectedColor = Colors.blue;
+
+  void initState() {
+    super.initState();
+    if (widget.mode != null) {
+      _descriptionController.text = widget.mode!.description;
+      _selectedIcon = widget.mode!.icon;
+      _selectedColor = widget.mode!.color;
+    }
+  }
+  void _saveMode() {
+    String description = _descriptionController.text;
+    Mode updatedMode = Mode(id: widget.mode != null ? widget.mode!.id : Uuid().v4(), description: description, icon: _selectedIcon, color: _selectedColor);
+    if (widget.mode != null) {
+      // Update existing mode
+      _modeService.updateMode(widget.mode!.id, updatedMode);
+    } else {
+      // Create new mode
+      _modeService.addMode(updatedMode);
+    }
+    Navigator.pop(context, updatedMode);
+  }
+
+
+  @override
+  void dispose() {
+    _descriptionController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Create Reminder'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            TextField(
+              controller: _descriptionController,
+              decoration: const InputDecoration(
+                labelText: 'Description',
+              ),
+            ),
+            const SizedBox(height: 20),
+            const Text('Select Icon:',
+                style:
+                TextStyle(fontSize: 20)
+            ),
+            IconButton(
+                icon: Icon(_selectedIcon),
+                onPressed: () { _pickIcon(context);
+                },
+                iconSize: 40
+            ),
+            const SizedBox(height: 20),
+            const Text('Select Color:',
+                style:
+                TextStyle(
+                    fontSize: 20)
+            ),
+            const SizedBox(height: 10),
+            GestureDetector(
+              onTap: () {
+                _pickColor(context);
+              },
+              child: Container(
+                width: 40,
+                height: 40,
+                decoration: BoxDecoration(
+                  color: _selectedColor,
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+              ),
+            ),
+            const SizedBox(height: 50),
+            TextButton(
+              onPressed: _saveMode,
+              child: const Text('Save Mode',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _pickIcon(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.max,
+              children: [
+                const Text('Pick an Icon'),
+                const SizedBox(height: 16.0),
+                _buildIconGrid(context),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildIconGrid(BuildContext context) {
+    List<IconData> icons = [
+      Icons.home,
+      Icons.work,
+      Icons.beach_access,
+      Icons.directions_car,
+      Icons.accessibility_new,
+      Icons.menu_book,
+      Icons.school,
+      Icons.lightbulb,
+      Icons.fastfood_outlined,
+      Icons.coffee,
+      Icons.school,
+      Icons.lightbulb,
+      Icons.attach_money,
+      Icons.brush,
+      Icons.camera,
+      Icons.directions_bike,
+      Icons.directions_bus,
+      Icons.directions_boat,
+      Icons.directions_railway,
+      Icons.directions_run,
+      Icons.directions_walk,
+      Icons.event,
+      Icons.favorite,
+      Icons.home_work,
+      Icons.kitchen,
+      Icons.local_cafe,
+      Icons.local_gas_station,
+      Icons.local_hospital,
+      Icons.local_pharmacy,
+      Icons.local_pizza,
+      Icons.movie,
+      Icons.music_note,
+      Icons.shopping_basket,
+      Icons.shopping_cart,
+      Icons.sports_soccer,
+      Icons.star,
+      Icons.tag_faces,
+      Icons.terrain,
+      Icons.train,
+      Icons.work,
+    ];
+
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height  * 0.8// Adjust the height as needed
+        ),
+        child: GridView.builder(
+          shrinkWrap: true,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+          ),
+          itemCount: icons.length,
+          itemBuilder: (BuildContext context, int index) {
+            // Use the IconData at the current index
+            IconData iconData = icons[index];
+            return IconButton(
+              icon: Icon(iconData),
+              onPressed: () {
+                setState(() {
+                  _selectedIcon = iconData; // Update the selected icon
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  void _pickColor(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Pick a Color'),
+                const SizedBox(height: 16.0),
+                _buildColorGrid(context),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildColorGrid(BuildContext context) {
+    List<Color> colors = [
+      Colors.red,
+      Colors.redAccent,
+      Colors.pink,
+      Colors.pinkAccent,
+      Colors.purple,
+      Colors.purpleAccent,
+      Colors.deepPurple,
+      Colors.deepPurpleAccent,
+      Colors.indigo,
+      Colors.indigoAccent,
+      Colors.blue,
+      Colors.blueAccent,
+      Colors.lightBlue,
+      Colors.lightBlueAccent,
+      Colors.cyan,
+      Colors.cyanAccent,
+      Colors.teal,
+      Colors.tealAccent,
+      Colors.green,
+      Colors.greenAccent,
+      Colors.lightGreen,
+      Colors.lightGreenAccent,
+      Colors.lime,
+      Colors.limeAccent,
+      Colors.yellow,
+      Colors.yellowAccent,
+      Colors.amber,
+      Colors.amberAccent,
+      Colors.orange,
+      Colors.orangeAccent,
+      Colors.deepOrange,
+      Colors.deepOrangeAccent,
+      Colors.brown,
+      Colors.grey,
+      Colors.blueGrey,
+      Colors.black,
+      Colors.white,
+    ];
+
+
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.of(context).size.height * 0.7, // Adjust the height as needed
+        ),
+        child:  GridView.builder(
+          shrinkWrap: true,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 5,
+          ),
+          itemCount: colors.length,
+          itemBuilder: (BuildContext context, int index) {
+            // Use the Color at the current index
+            Color color = colors[index];
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedColor = color; // Update the selected color
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Container(
+                width: 50,
+                height: 50,
+                color: color,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }}
+
+
+
+
