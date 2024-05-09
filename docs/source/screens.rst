@@ -67,23 +67,23 @@ Code for the Specific Edit and delete widgets which are found in the bottom righ
 
 ..code-block :: dart
 
-  Align(
-    alignment: Alignment.bottomRight,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-               IconButton(
-                 icon: const Icon(Icons.edit),
-                 onPressed: () {
-                 // Navigate to edit page
-                    _navigateToEditMode(mode);
-                  },
-                 ),
+    Align(
+      alignment: Alignment.bottomRight,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+              children: [
                  IconButton(
-                   icon: const Icon(Icons.delete),
+                    icon: const Icon(Icons.edit),
                    onPressed: () {
-                  // Delete mode
-                    _deleteMode(mode);
+                   // Navigate to edit page
+                      _navigateToEditMode(mode);
+                    },
+                   ),
+                   IconButton(
+                     icon: const Icon(Icons.delete),
+                     onPressed: () {
+                    // Delete mode
+                      _deleteMode(mode);
 
 
 Full block of code for the mode widget:
