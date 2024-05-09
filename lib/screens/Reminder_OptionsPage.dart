@@ -3,6 +3,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class ReminderScreen extends StatefulWidget {
   // const ReminderScreen({super.key});
@@ -40,45 +41,26 @@ class _ReminderScreenState extends State<ReminderScreen> {
   }
 
   XFile? _imageFile;
+  String? _imageUrl;
   DateTime? _dateTime;
 
-   Future<void> _pickImage() async {
+  final FirebaseStorage _storage = FirebaseStorage.instance;
+
+  Future<void> _pickImage() async {
     final ImagePicker _picker = ImagePicker();
-    final XFile? image = await showDialog<XFile>(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: const Text('Choose an option'),
-          content: const Text('Select an image source'),
-          actions: <Widget>[
-            TextButton(
-              child: const Text('Gallery'),
-              onPressed: () async {
-                final XFile? galleryImage =
-                await _picker.pickImage(source: ImageSource.gallery);
-                if (galleryImage != null) {
-                  Navigator.of(context).pop(galleryImage);
-                }
-              },
-            ),
-            TextButton(
-              child: const Text('Camera'),
-              onPressed: () async {
-                final XFile? cameraImage =
-                await _picker.pickImage(source: ImageSource.camera);
-                if (cameraImage != null) {
-                  Navigator.of(context).pop(cameraImage);
-                }
-              },
-            ),
-          ],
-        );
-      },
-    );
+    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
     if (image != null) {
+      // Upload the image to Firebase Storage
+      final Reference storageRef = _storage.ref().child('images/${image.name}');
+      final UploadTask uploadTask = storageRef.putFile(File(image.path).absolute);
+      final TaskSnapshot snapshot = await uploadTask;
+      final String downloadUrl = await snapshot.ref.getDownloadURL();
+
       setState(() {
         _imageFile = image;
+        _imageUrl = downloadUrl;
+        // Store the download URL
       });
     }
   }
@@ -232,13 +214,13 @@ class _ReminderScreenState extends State<ReminderScreen> {
                   trailing: Icon(Icons.arrow_forward_ios), // Arrow icon
                   onTap: _pickImage, // Call the pick image function on tap
                 ),
-                _imageFile != null
-                    ? Image.file(
-                        File(_imageFile!.path),
-                        height: 100,
-                        width: 100,
-                      )
-                    : Container(),
+              _imageUrl != null
+                  ? Image.network(
+                _imageUrl!,
+                height: 100,
+                width: 100,
+              )
+                  : Container(),
                 const ListTile(
                   leading: Text(
                     'Mode',
