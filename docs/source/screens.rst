@@ -84,6 +84,8 @@ Code for the Specific Edit and delete widgets which are found in the bottom righ
                      onPressed: () {
                     // Delete mode
                       _deleteMode(mode);
+                    },
+                    ),
 
 
 Full block of code for the mode widget:
