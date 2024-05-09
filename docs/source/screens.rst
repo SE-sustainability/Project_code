@@ -37,19 +37,34 @@ Below is the code for the settings wiget:
 Below is the code for the Mode Options widget:
 
 .. code-block:: dart
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
+
+       floatingActionButton: FloatingActionButton(
+          onPressed: () async {
           _navigateToModeOption();
-        },
-     child: const Icon(Icons.add),
-      ),
-    );
+          },
+       child: const Icon(Icons.add),
+        ),
+      );
 
 
 *Mode Widgets*
 
 These widgets are all customised by the user which will appear very different to different users. When each mode is clicked the app will navigate to the specific mode reminders. The app does this by looking into a database to find the modes which have been stored, and how the user has decided how it looks, It then will sort them into 2 column rows. Below is the code for the mode widgets specifically. The modes are stored in a database with the mode.id as the primary ID, which is also used as a foreign key for reminders, it will go down the foreign keys and for each mode use "mode.description" for the name of the mode, "mode.color" for the colour of the widget and "mode.icon" for the icon within the widget. //is mode.icon a foreign key??// In the bottom right of the widget there is an edit button, which takes users to a page allowing them to edit the details of the mode. Next to the edit icon, there is a delete icon which will delete the mode by deleting the row in the database so it will no longer show up for the users. This widget is the most code-heavy and difficult to implement on the page as it appears different depending on what modes are within the database. 
 
+The code which takes the user to the specific mode using the mode's id:
+
+.. code-block:: dart
+
+    Widget _buildModeCard(Mode mode) {
+      return GestureDetector(
+        onTap: () {
+          // Handle mode selection here
+          _navigateToReminderPage();
+          // modeHandler(mode.id);
+          print("Selected mode: ${mode.description}");
+        },
+
+Full block of code for the mode widget:
 
 .. code-block:: dart
 
