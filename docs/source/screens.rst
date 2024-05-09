@@ -464,22 +464,22 @@ The code for the Slider widget is below:
 
 .. code-block:: dart
 
-Slider(
-  value: _currentSliderValue,
-  max: 50,
-  min: 10,
-  divisions: 4,
-  label: _currentSliderValue.round().toString(),
-  activeColor: getAppBarColor(_color),
-  inactiveColor: getAppBarColor(_color),
-  onChanged: (double value) {
-  setState(() {
-    _currentSliderValue = value;
-
-    editSetting(_dropdownValue, value);
-  });
- },
-)
+  Slider(
+    value: _currentSliderValue,
+    max: 50,
+    min: 10,
+    divisions: 4,
+    label: _currentSliderValue.round().toString(),
+    activeColor: getAppBarColor(_color),
+    inactiveColor: getAppBarColor(_color),
+    onChanged: (double value) {
+    setState(() {
+      _currentSliderValue = value;
+    
+      editSetting(_dropdownValue, value);
+    });
+   },
+  )
 
 *Storing app settings*
 
