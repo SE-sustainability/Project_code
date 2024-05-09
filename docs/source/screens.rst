@@ -65,7 +65,7 @@ The code which takes the user to the specific mode using the mode's id:
 
 Code for the Specific Edit and delete widgets which are found in the bottom right of each mode widget:
 
-..code-block :: dart
+.. code-block :: dart
 
     Align(
         alignment: Alignment.bottomRight,
