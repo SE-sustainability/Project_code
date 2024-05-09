@@ -483,7 +483,322 @@ The code for the Slider widget is below:
 
 *Storing app settings*
 
-*Implemnation accross the app*
+The app makes sure that the settings are consistent across the whole app. The app stores the settings in a database called Firebase. It's used as it allows the app to update in real-time, which allows the settings to be implemented extremely quickly. The database is updated every time the user changes any setting, this happens because the selection of an item on the dropdown menu or sliding the slider triggers the :samp:`editsetting` function. This function tells the database to query the collection named :samp:`settings` within the document called "lglhw4pN0FNw9LaOiVqX", it then sets either the :samp:`_initialColor` or samp:`_fontSize` to the new colour or new text size respectfully.
+
+Below is the code for storing the changed setting into the database:
+
+.. code-block:: dart
+
+  void editSetting(String? newColour, double? newSize) async {
+      setState(() {
+        _color = newColour;
+        _fontSize = newSize;
+      });
+  
+      final settingsData = {
+        'colour': newColour,
+        if (newSize != null) 'font_Size': newSize,
+      };
+
+      await FirebaseFirestore.instance
+          .collection('settings')
+          .doc('lglhw4pN0FNw9LaOiVqX')
+          .set(settingsData);
+    }
+
+    void _getSettingsData() async {
+      FirebaseFirestore.instance
+          .collection('settings')
+          .doc('lglhw4pN0FNw9LaOiVqX')
+          .snapshots()
+          .listen((settingsData) {
+
+        setState(() {
+          colour = settingsData['colour'];
+          fontSize = settingsData['font_Size'];
+          _currentSliderValue = settingsData['font_Size']?.toDouble() ?? 20.0;
+        });
+      });
+    }
+
+*Implementation accross the app*
+
+Whenever a screen is loaded within the app, one of the first things that the code does is access the Firebase database, by running the :samp:`_listenToSettingsChanges()` which in turn runs :samp:`snapshots()`. function. This 'listens' to changes in the collection called :samp:`settings`, in the document with the id of "lglhw4pN0FNw9LaOiVqX". When there is a change in the data within the collection, the code will get Firebase to retrieve the new value(s) and in turn update the local variables named :samp:`_backgroundColor` and :samp:`_fontSize`. These variables are then used in :samp:`build()` methods which is what the user will see.
+
+Below is the code which shows how the database is accessed when data changes - this code is found in every other screen apart from settings:
+
+.. code-block:: dart
+
+  void _listenToSettingsChanges() {
+    FirebaseFirestore.instance
+        .collection('settings')
+        .doc('lglhw4pN0FNw9LaOiVqX')
+        .snapshots()
+        .listen((settingsData) {
+      setState(() {
+        _backgroundColor = settingsData['colour'];
+        _fontSize = settingsData['font_Size']?.toDouble();
+      });
+    });
+  }
+
+Below is the full code for the settings screen:
+
+.. code-block:: dart
+
+    import 'package:flutter/material.dart';
+    import 'package:coursework_project/screens/Backend/settings.dart';
+    import 'package:coursework_project/services/settings_services.dart';
+    import 'package:cloud_firestore/cloud_firestore.dart';
+    import 'package:firebase_core/firebase_core.dart';
+
+    String colour = "white";
+    int fontSize = 20;
+
+    class CreateSettingsScreen extends StatefulWidget {
+      //const CreateSettingsScreen({super.key});
+
+      @override
+      _CreateSettingsScreenState createState() => _CreateSettingsScreenState();
+    }
+
+    class _CreateSettingsScreenState extends State<CreateSettingsScreen> {
+
+      String? _initialColor;
+      double? _initialFontSize;
+
+      String? _color;
+      double? _fontSize;
+
+      final SettingsService _databaseService = SettingsService();
+      final List<AppSettings> app_settings = [];
+
+      final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
+      @override
+      void initState() {
+        super.initState();
+        _fetchSettings();
+        _getSettingsData();
+        _initializeFirebase();
+        _fetchSettingsFromFirebase();
+      }
+
+      Future<void> _initializeFirebase() async {
+        await Firebase.initializeApp();
+      }
+
+      Future<void> _fetchSettingsFromFirebase() async {
+        final settingsDoc = await FirebaseFirestore.instance
+            .collection('settings')
+            .doc('lglhw4pN0FNw9LaOiVqX')
+            .get();
+
+        if (settingsDoc.exists) {
+          final settingsData = settingsDoc.data();
+          setState(() {
+            _initialColor = settingsData?['colour'];
+            _initialFontSize = settingsData?['font_Size']?.toDouble();
+
+            _color = _initialColor;
+            _fontSize = _initialFontSize;
+          });
+        }
+      }
+
+      Future<void> _fetchSettings() async {
+        final fetchedSettings = await _databaseService.getSettings().first;
+
+        final settingsList = fetchedSettings.docs.map((doc){
+          final data = doc.data() as Map<String, dynamic>;
+          return AppSettings.fromJson(data);
+        }).toList();
+
+        setState(() {
+          app_settings.addAll(settingsList);
+        });
+      }
+
+
+      String _dropdownValue = colour.toString();
+
+      var _items = [        "white",        "grey",        "green",        "blue",        "yellow"      ];
+
+      double  _currentSliderValue = fontSize.toDouble();
+
+      Color getBackgroundColor(color){
+        if (color == "white"){
+          return Colors.white;
+        }
+        else if (color == "grey"){
+          return Colors.black87;
+        }
+        else if (color == "green"){
+          return Colors.green;
+        }
+        else if (color == "blue"){
+          return Colors.blue;
+        }
+        else {
+          return Colors.yellow;
+        }
+      }
+
+      Color getTextColor(color){
+        return Colors.white;
+      }
+
+      Color getAppBarColor(color){
+        if (color == "white"){
+          return Colors.blue;
+        }
+        else if (color == "grey"){
+          return Colors.white12;
+        }
+        else if (color == "green"){
+          return Colors.blue;
+        }
+        else if (color == "blue"){
+          return Colors.black12;
+        }
+        else {
+          return Colors.white12;
+        }
+      }
+
+      Color getDropdownTextColor(color){
+        return Colors.black;
+      }
+
+      void editSetting(String? newColour, double? newSize) async {
+        setState(() {
+          _color = newColour;
+          _fontSize = newSize;
+        });
+
+        final settingsData = {
+          'colour': newColour,
+          if (newSize != null) 'font_Size': newSize,
+        };
+
+        await FirebaseFirestore.instance
+            .collection('settings')
+            .doc('lglhw4pN0FNw9LaOiVqX')
+            .set(settingsData);
+      }
+
+      void _getSettingsData() async {
+        FirebaseFirestore.instance
+            .collection('settings')
+            .doc('lglhw4pN0FNw9LaOiVqX')
+            .snapshots()
+            .listen((settingsData) {
+
+          setState(() {
+            colour = settingsData['colour'];
+            fontSize = settingsData['font_Size'];
+            _currentSliderValue = settingsData['font_Size']?.toDouble() ?? 20.0;
+          });
+        });
+      }
+
+      @override
+      Widget build (BuildContext context) {
+        return Scaffold(
+            backgroundColor: _color != null ? getBackgroundColor(_color!) : Colors.white,
+            appBar: AppBar (
+              backgroundColor: _color != null ? getAppBarColor(_color!) : Colors.blue,
+              title: Text(
+                'Settings',
+                style: TextStyle(
+                  color: _color != null ? getTextColor(_color!) : Colors.white,
+                  fontSize: _fontSize ?? 20.0,
+                ),
+              ),
+            ),
+            body: SingleChildScrollView(
+                child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(0, 50, 0, 0),
+                        child: Card(
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+                            margin: const EdgeInsets.all(10.0),
+                            color: getAppBarColor(_color),
+                            child: ListTile(
+                              title: Text("Theme", style: TextStyle(color: getTextColor(_color), fontSize: _fontSize)),
+                              trailing: Icon(Icons.color_lens, color: getTextColor(_color)),
+                            )
+                        ),
+                      ),
+
+                      Padding(
+                          padding: EdgeInsets.fromLTRB(0, 0, 0, 50),
+                          child: Center(
+                              child: DropdownButton(
+                                items: _items.map((String item){
+                                  return DropdownMenuItem(
+                                      value: item,
+                                      child: Text(item)
+                                  );
+                                }).toList(),
+                                onChanged: (String? newValue){
+
+                                  setState(() {
+                                    _dropdownValue = newValue!;
+                                  });
+
+                                  editSetting(newValue!, _currentSliderValue);
+
+                                  print(colour.toString());
+                                  print(fontSize);
+                                },
+                                value: _color,
+                                borderRadius: BorderRadius.circular(10),
+                                style: TextStyle(
+                                    fontSize: _currentSliderValue,
+                                    color: getDropdownTextColor(_color)
+                                ),
+                                underline: Container(),
+                              )
+                          )
+                      ),
+
+                      Card(
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(5.0)),
+                          margin: const EdgeInsets.all(10.0),
+                          color: getAppBarColor(_color),
+                          child: ListTile(
+                            title: Text("Font Size", style: TextStyle(color: getTextColor(_color), fontSize: _fontSize)),
+                            trailing: Text(_fontSize.toString(), style: TextStyle(color: getTextColor(_color))),
+                          )
+                      ),
+
+                      Slider(
+                        value: _currentSliderValue,
+                        max: 50,
+                        min: 10,
+                        divisions: 4,
+                        label: _currentSliderValue.round().toString(),
+                        activeColor: getAppBarColor(_color),
+                        inactiveColor: getAppBarColor(_color),
+                        onChanged: (double value) {
+                          setState(() {
+                            _currentSliderValue = value;
+
+                            editSetting(_dropdownValue, value);
+                          });
+                        },
+                      )
+
+                    ]
+                )
+            )
+        );
+      }
+    }
+
 
 
 Creating recipes
