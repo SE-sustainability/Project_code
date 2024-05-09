@@ -66,23 +66,23 @@ The code which takes the user to the specific mode using the mode's id:
 Code for the Specific Edit and delete widgets which are found in the bottom right of each mode widget:
 
 ..code-block :: dart
-           Align(
-              alignment: Alignment.bottomRight,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () {
-                      // Navigate to edit page
-                      _navigateToEditMode(mode);
-                    },
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () {
-                      // Delete mode
-                      _deleteMode(mode);
+  Align(
+    alignment: Alignment.bottomRight,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+               IconButton(
+                 icon: const Icon(Icons.edit),
+                 onPressed: () {
+                 // Navigate to edit page
+                    _navigateToEditMode(mode);
+                  },
+                 ),
+                 IconButton(
+                   icon: const Icon(Icons.delete),
+                   onPressed: () {
+                  // Delete mode
+                    _deleteMode(mode);
 
 
 Full block of code for the mode widget:
