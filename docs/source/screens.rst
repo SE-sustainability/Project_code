@@ -6,50 +6,49 @@ There are 5 different files for each of the 5 different screens within our app; 
 
 Mode Page
 ------------
-The first page which is opened when the app is Run is the "Mode Page" This page allows the user to choose which mode the reminders are in. When the app is launched for the first time there will be no options for modes that you can have. To add a reminder mode, you will have to click the widget in the bottom right of the screen which resembles a plus in a circle which will direct the user to the "Mode Page Options", allowing the user to create a mode which will be accessible on the "Mode Page". When Modes Have been created there will be the modes show up on the "Mode Page" as clickable widgets, when clicked it will take to the user to the unique reminders page. 
+The first page which is opened when the app is Run is the "Mode Page" This page allows the user to choose which mode the reminders are in. When the app is launched for the first time there will be no options for modes that you can have. To add a reminder mode, you will have to click the widget in the bottom right of the screen which resembles a plus in a circle which will direct the user to the "Mode Page Options", allowing the user to create a mode which will be accessible on the "Mode Page". When Modes Have been created there will be the modes show up on the "Mode Page" as clickable widgets, when clicked it will take the user to the unique reminders page. The Mode Page may also appear different to the user depending on how the user has the settings within the setting page.
 
 **Interactive Widgets**
 
-There are interactive widgets within the Mode Page. The Options widget, the modes widgets and the general settings for the app.
+There are interactive widgets within the Mode Page. The Options widget, the modes widgets and the general settings widget for the app.
 
 *Options Widget and Settings Widget*
 
-Both of these widgets are hard-coded into the app, however, they do different things. The Options Widget is one of the 2 possible types of interactive widgets on this page. This widget will appear the same for all users, it allows the user to go to the mode options page, and edit the modes found within the mode page such as add, edit or delete. The settings widget resembles a cog in the top right corner, it will open up the settings page, allowing the user to change the appearance of the app. Both of these specific widgets will take the user to the specific pages when clicked. Within the code both of these widgets are built together in one widget scaffold.
+Both of these widgets are hard-coded into the app, however, they have different functionality. The Options Widget is one of the 2 possible types of interactive widgets on this page. This widget will appear the same for all users, it allows the user to go to the mode options page, and edit the modes found within the mode page such as add, edit or delete. The settings widget resembles a cog in the top right corner, it will open up the settings page, allowing the user to change the appearance of the app. Both of these specific widgets will take the user to the specific pages when clicked, The Options widget will take the user to the Mode Options Page and the settings widget will take the user Within the code both of these widgets are built together in one widget scaffold.
 
 Below is the code for the settings wiget:
 
 .. code-block:: dart
 
   @override
-       Widget build(BuildContext context) {
-         return Scaffold(
-           appBar: AppBar(
-             title: const Text('Reminders App'),
-             actions: [
-               IconButton(
-                 tooltip: 'Settings',
-                 onPressed: () {},
-                 icon: const Icon(Icons.settings),
-               ),
-             ],
-           ),
+  IconButton(
+    tooltip: 'Settings',
+    onPressed: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => CreateSettingsScreen()),
+      );
+    },
+    icon: const Icon(Icons.settings),
+  ),
 
 Below is the code for the Mode Options widget:
 
 .. code-block:: dart
 
-       floatingActionButton: FloatingActionButton(
-          onPressed: () async {
-          _navigateToModeOption();
-          },
-       child: const Icon(Icons.add),
-        ),
+  FloatingActionButton(
+    onPressed: () async {
+      _navigateToModeOption();
+    },
+     child: const Icon(Icons.add),
+  ),
       
 
 
 *Mode Widgets*
 
-These widgets are all customised by the user which will appear very different to different users. When each mode is clicked the app will navigate to the specific mode reminders. The app does this by looking into a database to find the modes which have been stored, and how the user has decided how it looks, It then will sort them into 2 column rows. Below is the code for the mode widgets specifically. The modes are stored in a database with the mode.id as the primary ID, which is also used as a foreign key for reminders, it will go down the foreign keys and for each mode use "mode.description" for the name of the mode, "mode.color" for the colour of the widget and "mode.icon" for the icon within the widget. //is mode.icon a foreign key??// In the bottom right of the widget there is an edit button, which takes users to a page allowing them to edit the details of the mode. Next to the edit icon, there is a delete icon which will delete the mode by deleting the row in the database so it will no longer show up for the users. This widget is the most code-heavy and difficult to implement on the page as it appears different depending on what modes are within the database. 
+The widgets which are created within the mode widget will appear different to every user as they are customised to how the user has added them.  When each mode is clicked the app will navigate to the specific mode reminders. This is achieved by the app retrieving the mode settings from the database based on the user's preferences. The modes are sorted into this database with :samp:`mode.id` as the primary key, which is also used as a foreign key for reminders to associate them with a mode. The name of the mode is stored under :samp:`mode.description`. The rest of the columns within the database are associated with the appearance of the widget for the mode: :samp:`mode.color` for the colour and `mode.icon` for the icon. In the bottom right of the widget there is an edit button, which takes users to a page to edit the details of the mode. Next to the edit icon, there is a delete icon which will delete the mode by deleting the row in the database so it will no longer show up for the users. This widget is the most code-heavy and difficult to implement.
+
 
 The code which takes the user to the specific mode using the mode's id:
 
@@ -64,75 +63,96 @@ The code which takes the user to the specific mode using the mode's id:
           print("Selected mode: ${mode.description}");
         },
 
+Code for the Specific Edit and delete widgets which are found in the bottom right of each mode widget:
+
+..code-block :: dart
+           Align(
+              alignment: Alignment.bottomRight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      // Navigate to edit page
+                      _navigateToEditMode(mode);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      // Delete mode
+                      _deleteMode(mode);
+
+
 Full block of code for the mode widget:
 
 .. code-block:: dart
 
-     Widmodeget _buildModeCard(Mode mode) {
-       return GestureDetector(
-         onTap: () {
-           // Handle mode selection here
-           _navigateToReminderPage();
-           // modeHandler(mode.id);
-           print("Selected mode: ${mode.description}");
-         },
-         child: Card(
-           color: mode.color,
-           shape: RoundedRectangleBorder(
-             borderRadius: BorderRadius.circular(12.0),
-           ),
-           elevation: 4.0,
-           child: Stack(
-             children: [
-               Center(
-               child : Column(
-               mainAxisAlignment: MainAxisAlignment.center,
-               children: [
-                 Icon(
-                   mode.icon,
-                   size: 40.0,
-                   color: Colors.white,
-                 ),
-                 const SizedBox(height: 8.0),
-                 Text(
-                   mode.description,
-                   style: const TextStyle(
-                     color: Colors.white,
-                     fontWeight: FontWeight.bold,
-                   ),
-                 ),
-               ],
-             ),
-             ),
-             Align(
-               alignment: Alignment.bottomRight,
-               child: Row(
-                 mainAxisAlignment: MainAxisAlignment.end,
-                 children: [
-                   IconButton(
-                     icon: const Icon(Icons.edit),
-                     onPressed: () {
-                       // Navigate to edit page
-                       _navigateToEditMode(mode);
-                     },
-                   ),
-                   IconButton(
-                     icon: const Icon(Icons.delete),
-                     onPressed: () {
-                       // Delete mode
-                       _deleteMode(mode);
-                     },
-                   ),
-                 ],
-               ),
-             ),
-             ],
-           ),
-         ),
-       );
-      }
-     }
-
+  Widget _buildModeCard(Mode mode, double fontSize) {
+    return GestureDetector(
+      onTap: () {
+        // Handle mode selection here
+          _navigateToReminderPage();
+        // modeHandler(mode.id);
+        print("Selected mode: ${mode.description}");
+      },
+      child: Card(
+        color: mode.color,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12.0),
+        ),
+        elevation: 4.0,
+        child: Stack(
+          children: [
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    mode.icon,
+                    size: 40.0,
+                    color: Colors.white,
+                  ),
+                  const SizedBox(height: 8.0),
+                  Text(
+                    mode.description,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: fontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () {
+                      // Navigate to edit page
+                      _navigateToEditMode(mode);
+                    },
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () {
+                      // Delete mode
+                      _deleteMode(mode);
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
 
 Below is the full code for "ModePage.dart"
@@ -325,6 +345,11 @@ Below is the full code for "ModePage.dart"
        );
       }
      }
+
+
+Settings Screen
+---------------
+Once The user has clicked the settings icon the app will take the user to the settings page, which allows the appereance of the app. The user can change the size of the font and the background of the app When the user fir
 
 Creating recipes
 ----------------
