@@ -14,7 +14,37 @@ There are interactive widgets within the Mode Page. The Options widget, the mode
 
 *Options Widget and Settings Widget*
 
-Both of these widgets are hard-coded into the app, however, they do different things. The Options Widget is one of the 2 possible types of interactive widgets on this page. This widget will appear the same for all users, it allows the user to go to the mode options page, and edit the modes found within the mode page such as add, edit or delete. The settings widget resembles a cog in the top right corner, it will open up the settings page, allowing the user to change the appearance of the app.
+Both of these widgets are hard-coded into the app, however, they do different things. The Options Widget is one of the 2 possible types of interactive widgets on this page. This widget will appear the same for all users, it allows the user to go to the mode options page, and edit the modes found within the mode page such as add, edit or delete. The settings widget resembles a cog in the top right corner, it will open up the settings page, allowing the user to change the appearance of the app. Both of these specific widgets will take the user to the specific pages when clicked. Within the code both of these widgets are built together in one widget scaffold.
+
+Below is the code for the settings wiget:
+
+.. code-block:: dart
+
+  @override
+       Widget build(BuildContext context) {
+         return Scaffold(
+           appBar: AppBar(
+             title: const Text('Reminders App'),
+             actions: [
+               IconButton(
+                 tooltip: 'Settings',
+                 onPressed: () {},
+                 icon: const Icon(Icons.settings),
+               ),
+             ],
+           ),
+
+Below is the code for the Mode Options widget:
+
+.. code-block:: dart
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          _navigateToModeOption();
+        },
+     child: const Icon(Icons.add),
+      ),
+    );
+
 
 *Mode Widgets*
 
