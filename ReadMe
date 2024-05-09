@@ -1,0 +1,48 @@
+# Note Taking App
+
+#this Flutter project serves as a simple Note Taking App.
+
+## Features
+- Create and edit notes, allowing to make bulet points and item checklist
+- Save notes locally
+- Simple and intuitive user interface
+-importing photo
+- able to minimise and maximize the font size
+-drawing feature
+
+## IDE Used
+This project was created using Intellij IDEA
+
+##built with
+- flutter run
+
+## Getting Started
+To run this project locally, follow the steps below:
+
+### Installation Requirements
+1. Verify that you have Flutter installed. If not, [install Flutter](https://flutter.dev/docs/get-started/install).
+2. Install dependencies using `flutter pub get`.
+3. Run the app using `flutter run`.
+
+#Usage:
+## Usage
+- Open the app.
+- Create a new note by tapping the '+' button.
+- Edit your notes.
+- add bullet points
+-add item checklist
+
+#running Pubspec.yaml
+to fetch the project dependencies you will need to run the following command in the terminal:
+
+ - flutter pub get
+
+to upgrade the flutter
+- flutter upgrade
+
+to verify SDK version matches the version specified in pubspec.yaml run:
+- flutter --version
+
+### Flutter Version Compatibility
+This project is built with Flutter version 3.16.5
+Make sure that your Flutter SDK version matches or is newer.
