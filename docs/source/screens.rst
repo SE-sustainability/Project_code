@@ -1234,6 +1234,387 @@ Full code for the Screen:
               maxHeight: MediaQuery
                  
 
+Reminders Page
+--------------
+
+This screen will be launched when the user presses on a mode, this reminders page will be unique to that mode as it will have a colour banner the same colour that the mode has. The page will also show the reminders that are specific to the mode which was pressed. The code then will fetch all the reminders that are stored in the database with a foreign key the same as the mode's primary id. The reminders that are found within the mode are sorted in a list, each reminder has 2 interactable widgets as well as the ability to long press it. The check box allows users to check off the reminder, The delete button will delete the reminder by deleting the record within the database, and the long press will bring up details of the reminder, allowing the user to edit the details of the reminder. In the bottom right corner of the screen there will be an interactable widget with a "+" on it, this will take the users to a screen to add a new reminder.
+
+*Retrieving data and Constructing reminder widgets*
+
+When the user presses on the mode for the reminders they would like to access, a data stream will be sent out. :samp:`StreamBuilder` listens for a stream of data, once it receives it, it will have the :samp:`mode.id` for the mode. This queries the Firebase Database which returns all the reminders with that specific :samp:`mode.id`. It then builds the records from the database into objects, each reminder object contains: a title, completion status, and description. The reminder widgets are then built using :samp:`ListView.builder` as every reminder is retrieved a :samp:`ListTile` widget is created, Which has the title as well as interactable checkbox and delete buttons. Each reminder is placed in a list.
+
+Below is the code for retrieving the data and creating the widgets:
+
+.. code-block:: dart
+
+  Widget _remindersListView() {
+    // final reminders = Provider.of<ReminderProvider>(context);
+    return SizedBox(
+        height: MediaQuery.sizeOf(context).height * 0.80,
+        width: MediaQuery.sizeOf(context).width,
+        child: StreamBuilder(
+            stream: _databaseService.getReminders(),
+            builder: (context, snapshot) {
+              List reminders = snapshot.data?.docs ?? [];
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return CircularProgressIndicator();
+              } else if (snapshot.hasError) {
+                return Text("Error: ${snapshot.error}");
+              } else if (snapshot.data == null) {
+                return Center(child: Text("No reminders found"));
+              }
+              if (reminders.isEmpty) {
+                return const Center(
+                  child: Text("Add a reminder"),
+                );
+              }
+
+              // print(reminders);
+              return ListView.builder(
+                  itemCount: reminders.length,
+                  itemBuilder: (context, index) {
+                    Reminder reminder = reminders[index].data();
+                    String reminderId =
+                        reminders[index].id; //Get id of reminder
+                    // print(reminderId);'#;
+                    // print(reminder);
+                    if (reminder.title == null || reminder.title.isEmpty) {
+                      return const Padding(
+                        padding: EdgeInsets.symmetric(
+                          vertical: 10,
+                          horizontal: 10,
+                        ),
+                        child: ListTile(
+                          title: Text("Error: Reminder has no title"),
+                        ),
+                      );
+                    }
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: 10,
+                      ),
+                      child: ListTile(
+                        title: Text(reminder.title),
+                        trailing: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Checkbox(
+                              value: reminder.completed,
+                              onChanged: (value) {
+                                Reminder updatedReminder = reminder.copyWith(
+                                    completed: !reminder.completed);
+                                _databaseService.updateReminder(
+                                    reminderId, updatedReminder); //checkbox.
+                              },
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.delete),
+                              onPressed: () {
+                                _databaseService.deleteReminder(
+                                    reminderId); // deletes reminders
+                              },
+                            ),
+                          ],
+                        ),
+                        onLongPress: () {
+                          FirebaseFirestore.instance
+                              .collection('reminders')
+                              .doc(reminderId)
+                              .get()
+                              .then((DocumentSnapshot documentSnapshot) {
+                            if (documentSnapshot.exists) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => ReminderScreen(
+                                        reminderId: documentSnapshot.id,
+                                        title: documentSnapshot['title'],
+                                        description:
+                                            documentSnapshot['description'])),
+                              );
+                            } else {
+                              print('Document does not exist');
+                            }
+                            ;
+                          });
+                        }, // navigate to reminder options to update current reminder
+                      ),
+                    );
+                  });
+            }));
+  }
+
+
+
+*Long press on reminder widget*
+
+When a long press occurs on the reminder widget using the :samp:`onLongPress` property, triggering :samp:`_navigateToReminderOptionsPage` which makes the program fetch the specific record from the firebase database using :samp:`reminderId`. If the page exists it navigates to the correct screen using :samp:`ReminderScreen` passing the reminder's ID, title, and description as parameters to the screen. This allows the user to edit the reminder, bypassing the reminder button.
+
+The code for the long press is:
+
+.. code-block:: dart
+
+    onLongPress: () {
+      FirebaseFirestore.instance
+          .collection('reminders')
+          .doc(reminderId)
+          .get()
+          .then((DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot.exists) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ReminderScreen(
+                    reminderId: documentSnapshot.id,
+                    title: documentSnapshot['title'],
+                    description:
+                        documentSnapshot['description'])),
+          );
+        } else {
+          print('Document does not exist');
+        }
+        ;
+      });
+    }
+
+*Check box and delete buttons on reminder Widgets*
+
+When the Reminders are added to the screen, the edit and delete buttons are added. The checkbox allows to change the reminder to become completed when checked, this is using the checkboxe's :samp:`trailing` property. Changing the reminder to complete will put a line through the writing. The delete button is next to the checkbox and when triggered, deletes the reminder by deleting the reminder within the database.
+
+below is the code for the checkbox and the delete button:
+
+.. code-block:: dart
+
+    Checkbox(
+      value: reminder.completed,
+      onChanged: (value) {
+        Reminder updatedReminder = reminder.copyWith(
+            completed: !reminder.completed);
+        _databaseService.updateReminder(
+            reminderId, updatedReminder); //checkbox.
+      },
+    ),
+    IconButton(
+      icon: Icon(Icons.delete),
+      onPressed: () {
+        _databaseService.deleteReminder(
+            reminderId);
+      },
+    )
+
+*Add Reminder Widget*
+
+The Add Reminder widget is located in the bottom right corner of the screen. When it is pressed it navigates the user to the "Reminders option page" screen. This widget will appear the same to each user.
+
+The code for the widget is below:
+
+.. code-block:: dart
+
+    floatingActionButton: FloatingActionButton(
+      onPressed: (_navigateToReminderOptionsPage),
+      backgroundColor: Theme.of(context).colorScheme.primary,
+      child: const Icon(
+        Icons.add,
+        color: Colors.white,
+      ),
+    )
+
+The code for the whole screen is:
+
+.. code-block:: dart
+
+    import 'package:cloud_firestore/cloud_firestore.dart';
+    import 'package:coursework_project/screens/Backend/reminder.dart';
+    // import 'package:coursework_project/services/reminder_provider';
+    import 'package:coursework_project/services/reminder_services.dart';
+    import 'Reminder_OptionsPage.dart';
+    import 'package:flutter/material.dart';
+    import 'NewReminder.dart';
+    // import 'package:provider/provider.dart';
+    // import 'package:shared_preferences/shared_preferences.dart';
+
+    class CreateNoteScreen extends StatefulWidget {
+      // final String reminderId;
+      // final String title; // Add title parameter
+
+      // const CreateNoteScreen({required this.reminderId, required this.title});
+
+      @override
+      _CreateNoteScreenState createState() => _CreateNoteScreenState();
+    }
+
+    class _CreateNoteScreenState extends State<CreateNoteScreen> {
+      final ReminderService _databaseService = ReminderService();
+
+      double fontSize = 16.0;
+      List<String> lines = [];
+      List<bool> checklistItems = [];
+      List<TextEditingController> checklistControllers = [];
+
+      @override
+      void initState() {
+        super.initState();
+      }
+
+      void _navigateToReminderOptionsPage() {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => NewReminderScreen()),
+        );
+      }
+
+      Future<void> _addReminder() async {
+        Reminder newReminder = Reminder(
+            title: 'New Reminder',
+            completed: false,
+            description: 'Description',
+            dateTime: Timestamp.now());
+        String reminderId = await _databaseService.addReminder(newReminder);
+
+        // Navigator.push(
+        //   context,
+        //   MaterialPageRoute(
+        //     builder: (context) => ReminderScreen(
+        //       reminderId: widget.reminderId,
+        //       title: widget.title,
+        //     ),
+        //   ),
+        // );
+      }
+
+      @override
+      Widget build(BuildContext context) {
+        return Scaffold(
+          resizeToAvoidBottomInset: false,
+          appBar: AppBar(
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            title: const Text('REMINDERS'),
+          ),
+          body: _buildUI(),
+          // creating a new reminder/navigating to reminder_options page
+          floatingActionButton: FloatingActionButton(
+            onPressed: (_navigateToReminderOptionsPage),
+            backgroundColor: Theme.of(context).colorScheme.primary,
+            child: const Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+          ),
+        );
+      }
+
+      Widget _buildUI() {
+        return SafeArea(
+            child: Column(
+          children: [
+            _remindersListView(),
+          ],
+        ));
+      }
+
+      Widget _remindersListView() {
+        // final reminders = Provider.of<ReminderProvider>(context);
+        return SizedBox(
+            height: MediaQuery.sizeOf(context).height * 0.80,
+            width: MediaQuery.sizeOf(context).width,
+            child: StreamBuilder(
+                stream: _databaseService.getReminders(),
+                builder: (context, snapshot) {
+                  List reminders = snapshot.data?.docs ?? [];
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return CircularProgressIndicator();
+                  } else if (snapshot.hasError) {
+                    return Text("Error: ${snapshot.error}");
+                  } else if (snapshot.data == null) {
+                    return Center(child: Text("No reminders found"));
+                  }
+                  if (reminders.isEmpty) {
+                    return const Center(
+                      child: Text("Add a reminder"),
+                    );
+                  }
+
+                  // print(reminders);
+                  return ListView.builder(
+                      itemCount: reminders.length,
+                      itemBuilder: (context, index) {
+                        Reminder reminder = reminders[index].data();
+                        String reminderId =
+                            reminders[index].id; //Get id of reminder
+                        // print(reminderId);'#;
+                        // print(reminder);
+                        if (reminder.title == null || reminder.title.isEmpty) {
+                          return const Padding(
+                            padding: EdgeInsets.symmetric(
+                              vertical: 10,
+                              horizontal: 10,
+                            ),
+                            child: ListTile(
+                              title: Text("Error: Reminder has no title"),
+                            ),
+                          );
+                        }
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 10,
+                            horizontal: 10,
+                          ),
+                          child: ListTile(
+                            title: Text(reminder.title),
+                            trailing: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Checkbox(
+                                  value: reminder.completed,
+                                  onChanged: (value) {
+                                    Reminder updatedReminder = reminder.copyWith(
+                                        completed: !reminder.completed);
+                                    _databaseService.updateReminder(
+                                        reminderId, updatedReminder); //checkbox.
+                                  },
+                                ),
+                                IconButton(
+                                  icon: Icon(Icons.delete),
+                                  onPressed: () {
+                                    _databaseService.deleteReminder(
+                                        reminderId); // deletes reminders
+                                  },
+                                ),
+                              ],
+                            ),
+                            onLongPress: () {
+                              FirebaseFirestore.instance
+                                  .collection('reminders')
+                                  .doc(reminderId)
+                                  .get()
+                                  .then((DocumentSnapshot documentSnapshot) {
+                                if (documentSnapshot.exists) {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => ReminderScreen(
+                                            reminderId: documentSnapshot.id,
+                                            title: documentSnapshot['title'],
+                                            description:
+                                                documentSnapshot['description'])),
+                                  );
+                                } else {
+                                  print('Document does not exist');
+                                }
+                                ;
+                              });
+                            }, // navigate to reminder options to update current reminder
+                          ),
+                        );
+                      });
+                }));
+      }
+    }
+
+Reminders Options Page
+----------------------
+
 Creating recipes
 ----------------
 
