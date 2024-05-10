@@ -856,7 +856,7 @@ This widget allows the user to choose an icon to represent the mode. This is rep
 
 Below is the code for the icon widget:
 
-.. code-block: dart
+.. code-block:: dart
   
   IconButton(
     icon: Icon(_selectedIcon),
@@ -1622,6 +1622,7 @@ This widget is a Text field allowing the user to input the name of the reminder 
 The code for this widget is below:
 
 .. code-block:: dart
+
   TextField(
     controller: _title,
     decoration: InputDecoration(
@@ -1654,6 +1655,7 @@ The widget used for setting the date and time uses the ListTile with :samp:`the 
 The code for this widget is below:
 
 .. code-block:: dart
+
   ListTile(
     leading: Icon(Icons.date_range),
     title: Text('Date & Time'),
@@ -1715,6 +1717,7 @@ The Taking picture widget uses a ListTile alongside :samp:`icon(Icons.camera)` w
 The code for this widget is below:
 
 .. code-block:: dart
+
   ListTile(
     leading: const Icon(Icons.camera), // Camera icon
     title: const Text('Take Picture'), // Take Picture label
@@ -1777,6 +1780,7 @@ The Code for the Save widget:
     )
 
 The whole screen code:
+
 .. code-block:: dart
 
     import 'package:cloud_firestore/cloud_firestore.dart';
