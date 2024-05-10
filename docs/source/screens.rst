@@ -1730,15 +1730,16 @@ The code for this widget is below:
 After capturing an image or selecting one from the device's gallery, the image is displayed in the UI using the Image.file widget. This widget presents the selected image to the user, allowing them to preview the picture before saving it as part of the reminder. It does this by calling the function :samp:`_pickImage`, this will allow users to choose a file which is an image.
 The code for this widget is below:
 
-.. code block:: dart
+.. code-block:: dart
 
-  _imageFile != null
-    ? Image.file(
-      File(_imageFile!.path),
-       height: 100,
-       width: 100,
-      )
-    : Container(),
+    _imageFile != null
+        ? Image.file(
+            File(_imageFile!.path),
+            height: 100,
+            width: 100,
+          )
+        : Container(),
+
 
 
 *Saving the reminder*
