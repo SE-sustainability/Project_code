@@ -2,9 +2,9 @@
 
 # -- Project information
 
-project = 'Lumache'
-copyright = '2021, Graziella'
-author = 'Graziella'
+project = 'Reminder App - 3c'
+copyright = ''
+author = 'Group 3C'
 
 release = '0.1'
 version = '0.1.0'
