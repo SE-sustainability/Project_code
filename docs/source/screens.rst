@@ -868,46 +868,41 @@ Below is the code for the icon widget:
 
 Below is the code that rearanages the icons into a grid:
 
-.. code-block: dart
+.. code-block:: dart
 
-  Widget _buildIconGrid(BuildContext context) {
-    List<IconData> icons = [
-      Icons.home,
-      Icons.work,
-      Icons.beach_access,
-    // List of icons in grid
-    ];
-    return SingleChildScrollView(
-      child: ConstrainedBox(
-        constraints: BoxConstraints(
-            maxHeight: MediaQuery
-                .of(context)
-                .size
-                .height * 0.8 // Adjust the height as needed
-        ),
-        child: GridView.builder(
-          shrinkWrap: true,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-          ),
-          itemCount: icons.length,
-          itemBuilder: (BuildContext context, int index) {
-            // Use the IconData at the current index
-            IconData iconData = icons[index];
-            return IconButton(
-              icon: Icon(iconData),
-              onPressed: () {
-                setState(() {
-                  _selectedIcon = iconData; // Update the selected icon
-                });
-                Navigator.of(context).pop(); // Close the dialog
-              },
-            );
-          },
-        ),
-      ),
-    );
-  }
+    Widget _buildIconGrid(BuildContext context) {
+        List<IconData> icons = [            Icons.home,            Icons.work,            Icons.beach_access,            // List of icons in grid        ];
+        return SingleChildScrollView(
+            child: ConstrainedBox(
+                constraints: BoxConstraints(
+                    maxHeight: MediaQuery
+                        .of(context)
+                        .size
+                        .height * 0.8 // Adjust the height as needed
+                ),
+                child: GridView.builder(
+                    shrinkWrap: true,
+                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3,
+                    ),
+                    itemCount: icons.length,
+                    itemBuilder: (BuildContext context, int index) {
+                        // Use the IconData at the current index
+                        IconData iconData = icons[index];
+                        return IconButton(
+                            icon: Icon(iconData),
+                            onPressed: () {
+                                setState(() {
+                                    _selectedIcon = iconData; // Update the selected icon
+                                });
+                                Navigator.of(context).pop(); // Close the dialog
+                            },
+                        );
+                    },
+                ),
+            ),
+        );
+    }
 
 
 *Colour Picker Drop Down*
@@ -918,9 +913,9 @@ Below is the code for the colour widget:
 
 .. code-break:: dart
 
-  void _pickColor(BuildContext context) {
-    showDialog(
-      context: context,
+void _pickColor(BuildContext context) {
+  showDialog(
+    context: context,
       builder: (BuildContext context) {
         return Dialog(
           child: Container(
@@ -994,9 +989,41 @@ Below is the code for the Colour grid:
 
 *Save Widget*
 
+Depending on if the user had decided to edit a mode or create a new one, the widget will work slightly diffrently. However the first step is the same, this being validating the inputs. For it is made sure that the Mode description text field is not empty. If it is empty the user will be unable to save the mode and there will be an error message. If its not null, the program will then go on to save the mode. The function :samp:`_descriptionController` will first retrieve the Mode description, assigning it to a new 'mode' called :samp:`updatedMode` alongside the selected icon and colour. It next checks to see if :samp:`widget.mode` is null or not. If it is not null (edit mode), the existing mode (witht the same :samp:`mode.id`) will be updated using the method :samp:`_modeService.updateMode()`. If it is null, a new mode will be created using the method :samp:`_modeService.addMode()`. The screen then existits to the previous page (Mode Page) with the new, updated data, using :samp:`Navigator.pop(context, updatedMode)`.
 
+The code for the save widget is below:
 
+.. code-break:: dart
 
+            const SizedBox(height: 50),
+            TextButton(
+              onPressed: _saveMode,
+              child: const Text('Save Mode',
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.w800,
+                ),),
+
+Code for the saving function:
+
+.. code-break:: dart
+
+  void _saveMode() {
+    String description = _descriptionController.text;
+    Mode updatedMode = Mode(
+        id: widget.mode != null ? widget.mode!.id : Uuid().v4(),
+        description: description,
+        icon: _selectedIcon,
+        color: _selectedColor);
+    if (widget.mode != null) {
+      // Update existing mode
+      _modeService.updateMode(widget.mode!.id, updatedMode);
+    } else {
+      // Create new mode
+      _modeService.addMode(updatedMode);
+    }
+    Navigator.pop(context, updatedMode);
+  }
 
 
 Creating recipes
