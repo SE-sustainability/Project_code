@@ -842,6 +842,7 @@ This text field will either apear with an existing mode description, the one the
 The code for the text field is below:
 
 .. code-block:: dart
+
   TextField(
     controller: _descriptionController,
     decoration: const InputDecoration(
@@ -849,11 +850,147 @@ The code for the text field is below:
     ),
   ),
 
-
-
 *Icon Drop Down*
 
+This widget allows the user to choose an icon to represent the mode. This is represented by a grid in whihc the user can choose from predefined icons. The :samp:`_buildIconGrid` method arranges the icons into a grid for the user to choose from.
+
+Below is the code for the icon widget:
+
+.. code-block: dart
+
+   IconButton(
+    icon: Icon(_selectedIcon),
+    onPressed: () {
+     _pickIcon(context);
+    },
+    iconSize: 40
+  ),
+
+Below is the code that rearanages the icons into a grid:
+
+.. code-block: dart
+
+  Widget _buildIconGrid(BuildContext context) {
+    List<IconData> icons = [
+      Icons.home,
+      Icons.work,
+      Icons.beach_access,
+    // List of icons in grid
+    ];
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+            maxHeight: MediaQuery
+                .of(context)
+                .size
+                .height * 0.8 // Adjust the height as needed
+        ),
+        child: GridView.builder(
+          shrinkWrap: true,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 3,
+          ),
+          itemCount: icons.length,
+          itemBuilder: (BuildContext context, int index) {
+            // Use the IconData at the current index
+            IconData iconData = icons[index];
+            return IconButton(
+              icon: Icon(iconData),
+              onPressed: () {
+                setState(() {
+                  _selectedIcon = iconData; // Update the selected icon
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+
 *Colour Picker Drop Down*
+
+The colour picker is programed very similary to the icon picker, only using colours instead of icons. The grid is built using the :samp:`_buildColorGrid`, when the user presses on the colour picker, the grid will appear. When the user presses on one of the colours, :samp:`_selectedColor` is triggered and the colour is updated.
+
+Below is the code for the colour widget:
+
+.. code-break:: dart
+
+  void _pickColor(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          child: Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text('Pick a Color'),
+                const SizedBox(height: 16.0),
+                _buildColorGrid(context),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+Below is the code for the Colour grid:
+
+.. code-break:: dart
+
+    Widget _buildColorGrid(BuildContext context) {
+    List<Color> colors = [
+      Colors.red,
+      Colors.redAccent,
+      // Long list of colours in same format.
+    ];
+
+
+    return SingleChildScrollView(
+      child: ConstrainedBox(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery
+              .of(context)
+              .size
+              .height * 0.7, // Adjust the height as needed
+        ),
+        child: GridView.builder(
+          shrinkWrap: true,
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 5,
+          ),
+          itemCount: colors.length,
+          itemBuilder: (BuildContext context, int index) {
+            // Use the Color at the current index
+            Color color = colors[index];
+            return GestureDetector(
+              onTap: () {
+                setState(() {
+                  _selectedColor = color; // Update the selected color
+                });
+                Navigator.of(context).pop(); // Close the dialog
+              },
+              child: Container(
+                width: 50,
+                height: 50,
+                color: color,
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+
+
+
+
+
 
 *Save Widget*
 
