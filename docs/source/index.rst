@@ -7,7 +7,6 @@ The app will have 5 pages, which will allow the user to Add, see, edit and delet
 Contents
 --------
 
-Lumache has its documentation hosted on Read the Docs.
 
 
 .. toctree::
