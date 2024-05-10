@@ -799,6 +799,67 @@ Below is the full code for the settings screen:
       }
     }
 
+Mode Page Options
+-----------------
+
+The user may access this screen in one of two ways, either by pressing the edit icon on a preexisting mode or by pressing the Mode Options widget in the bottom right of the corner on the "mode Page". This page has 3 inputs to allow the user to customise how the mode looks these being; a text box for the mode description, and drop-down grids for the icon and colour selection. If the user is editing a mode then what was saved in the database for that particular mode will be filled out, using the :samp:`mode.id`. If the user has decided to create a new mode the default page will show. this is; an empty text box for the description, the icon is set to alarm and the colour is blue. Once the desired information has been inputted, the user can press the save icon. If the user is editing the mode, the entry in the database will be updated according to the :samp:`mode.id` whereas if the user is creating a new mode, the data will be saved to the database using the next :samp:`mode.id` which is available.
+
+*editing vs creating a mode*
+
+Because this screen is used to create as well as edit modes, it's important to be able to differentiate the two. When the screen is loaded, :samp:`initState()` is run to determine what mode it is and therefore what the screen should look like. If :samp:`widget.mode` is null then the screen will be in creation mode, this means that the widgets will be in the default options, allowing a user to create a mode. When a user wants to edit a mode, :samp:`widget.mode` won't be null as when the edit icon is pressed, the mode.id will be passed into the screen, using the :samp: `ModePageOptions` class. due to :samp:`widget.mode` being not null and having the value of the :samp:`mode.id` of the mode that the user wants to edit, the rest of the :samp:`if` statement will fill in the description, icon and colour with what the mode was unedited.
+
+Below is the code which sees if and information has been transfered to this screen:
+
+.. code-block:: dart
+
+  class ModePageOptions extends StatefulWidget {
+    final Mode? mode;
+  
+    ModePageOptions({required this.mode});
+  
+    @override
+    _ModePageOptionState createState() => _ModePageOptionState();
+  }
+
+Below is the code which checks to see if :samp:`widget.mode` is null:
+
+.. code-block:: dart
+
+  void initState() {
+    super.initState();
+    if (widget.mode != null) {
+      _descriptionController.text = widget.mode!.description;
+      _selectedIcon = widget.mode!.icon;
+      _selectedColor = widget.mode!.color;
+    }
+  }
+
+
+*Mode Description Text field*
+
+This text field will either apear with an existing mode description, the one the user would like to edit, or be blank if the user is creating a new mode. This text field will be validated when the user attempts to save, as the mode must have a description. 
+
+The code for the text field is below:
+
+.. code-block:: dart
+  TextField(
+    controller: _descriptionController,
+    decoration: const InputDecoration(
+    labelText: 'Description',
+    ),
+  ),
+
+
+
+*Icon Drop Down*
+
+*Colour Picker Drop Down*
+
+*Save Widget*
+
+
+
+
 
 
 Creating recipes
