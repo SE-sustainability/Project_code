@@ -1,6 +1,6 @@
 Backend
 ========
-
+This page documents the 3 files which are stored in the file called "backend"
 
 Modes
 -----
@@ -123,3 +123,60 @@ The code for the file is below:
 
 Settings
 --------
+
+This file creates an :samp:`AppSettings` class which contains the application settings and provides methods to create instances from JSON and copy and convert instances to JSON. It's used to manage application configuration and user preferences.
+
+The properties of :samp:`AppSettings` are :samp:`appBarColour`, :samp:`colour`, :samp:`fontSize` and :samp:`textColour`. These properties are used within the settings screen (to change the values) and the whole app in the background. All properties are required in the class when creating a new instance.
+
+There are 2 constructors within the class. The first constructor of  the :samp:`AppSettings` class which initialises the properties when a new instance is created. The :samp:`fromJSON` constructor allows the creation of an :samp:`AppSettings` instance from a JSON map. It takes :samp:`Map<String, dynamic> json` (a JSON map) as an imput and extracts values to create a new  :samp:`AppSettings` object. To do this it assumes that the keys within the JSON file correspond to the properties of the :samp:`AppSettings`. 
+
+There are 2 Methods within this file. The :samp:`copyWith` method creates a copy of the current :samp:`AppSettings` instance with some of all of its attributes changed. This allows the user to update specific attributes without modifying the original instance. The :samp:`toJsom` method converts an :samp:`AppSettings` instance into a JSON map. The method returns a map containing  the properties of the :samp:`AppSettings` which can be stored easily.
+
+Below is the code in this file:
+
+.. code-block:: dart
+
+    class AppSettings {
+      final String appBarColour;
+      final String colour;
+      final int fontSize;
+      final String textColour;
+
+      AppSettings({
+        required this.appBarColour,
+        required this.colour,
+        required this.fontSize,
+        required this.textColour,
+      });
+
+      AppSettings.fromJson(Map<String, dynamic> json)
+          : appBarColour = json['appBarColour']! as String,
+            colour = json['colour']! as String,
+            fontSize = json['font_Size']! as int,
+            textColour = json['textColour']! as String;
+
+      AppSettings copyWith({
+        String? appBarColour,
+        String? colour,
+        int? fontSize,
+        String? textColour,
+      }) {
+        return AppSettings(
+          appBarColour: appBarColour ?? this.appBarColour,
+          colour: colour ?? this.colour,
+          fontSize: fontSize ?? this.fontSize,
+          textColour: textColour  ?? this.textColour,
+        );
+      }
+
+      Map<String, dynamic> toJson(){
+        return {
+          'appBarColour' : appBarColour,
+          'colour' : colour,
+          'font_Size' : fontSize,
+          'textColour' : textColour,
+        };
+      }
+    }
+
+
