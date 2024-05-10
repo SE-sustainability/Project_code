@@ -2147,6 +2147,7 @@ Image Picker:
 Once the user has finished editing, the reminder and would like to save it, they simply press the "SAVE" button. The first check that is done is that the title field is not empty so it's a valid input. Once the button is pressed the methods: :samp:`_updateDescription` and :samp:`_updateDateTime ` which correspond with the Firebase Database update their respective sections of the records. The updated data is then reflected visually in the UI.
 
 Below is the code for the save: 
+
 .. code-block:: dart
 
    Align(
@@ -2178,266 +2179,269 @@ Below is the code for the save:
      ),
    )
 
-Below is the whole code for this screen: 
+Below is the whole code for this screen:
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:geolocator/geolocator.dart';
-import 'package:flutter/material.dart';
-import 'package:firebase_storage/firebase_storage.dart';
+.. code-block:: dart
 
-class ReminderScreen extends StatefulWidget {
-  final String reminderId;
-  final String title;
-  String description;
+    import 'package:cloud_firestore/cloud_firestore.dart';
+    import 'package:image_picker/image_picker.dart';
+    import 'dart:io';
+    import 'package:geolocator/geolocator.dart';
+    import 'package:flutter/material.dart';
+    import 'package:firebase_storage/firebase_storage.dart';
 
-  ReminderScreen(
-      {Key? key,
-      required this.reminderId,
-      required this.title,
-      required this.description})
-      : super(key: key);
+    class ReminderScreen extends StatefulWidget {
+      final String reminderId;
+      final String title;
+      String description;
 
-  @override
-  _ReminderScreenState createState() => _ReminderScreenState();
-}
+      ReminderScreen(
+          {Key? key,
+          required this.reminderId,
+          required this.title,
+          required this.description})
+          : super(key: key);
 
-class _ReminderScreenState extends State<ReminderScreen> {
-  TextEditingController _description = TextEditingController();
-  final TextEditingController _date = TextEditingController();
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-
-  @override
-  void initState() {
-    super.initState();
-    if (widget.reminderId.isNotEmpty) {
-      _loadReminderOptions(id: widget.reminderId);
+      @override
+      _ReminderScreenState createState() => _ReminderScreenState();
     }
-  }
 
-  XFile? _imageFile;
-  String? _imageUrl;
-  DateTime? _dateTime;
-  final FirebaseStorage _storage = FirebaseStorage.instance;
+    class _ReminderScreenState extends State<ReminderScreen> {
+      TextEditingController _description = TextEditingController();
+      final TextEditingController _date = TextEditingController();
+      final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  Future<void> _pickImage() async {
-    final ImagePicker _picker = ImagePicker();
-    final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-
-    if (image != null) {
-      final Reference storageRef = _storage.ref().child('images/${image.name}');
-      final UploadTask uploadTask = storageRef.putFile(File(image.path).absolute);
-      final TaskSnapshot snapshot = await uploadTask;
-      final String downloadUrl = await snapshot.ref.getDownloadURL();
-
-      setState(() {
-        _imageFile = image;
-        _imageUrl = downloadUrl;
-      });
-    }
-  }
-
-  Future<Map<String, dynamic>> _loadReminderOptions(
-      {required String id}) async {
-    try {
-      DocumentSnapshot reminderSnapshot =
-          await _firestore.collection('reminders').doc(id).get();
-
-      if (reminderSnapshot.exists) {
-        Map<String, dynamic> data =
-            reminderSnapshot.data() as Map<String, dynamic>;
-        return data;
-      } else {
-        return {};
+      @override
+      void initState() {
+        super.initState();
+        if (widget.reminderId.isNotEmpty) {
+          _loadReminderOptions(id: widget.reminderId);
+        }
       }
-    } catch (e) {
-      print('Error loading reminder options: $e');
-      return {};
-    }
-  }
 
-  Future<void> _updateDescription(String newDescription) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('reminders')
-          .doc(widget.reminderId)
-          .update({'description': newDescription});
-      setState(() {
-        widget.description = newDescription;
-      });
-    } catch (e) {
-      print('Error updating description: $e');
-    }
-  }
+      XFile? _imageFile;
+      String? _imageUrl;
+      DateTime? _dateTime;
+      final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  Future<void> _updateDateTime(DateTime newDateTime) async {
-    try {
-      await FirebaseFirestore.instance
-          .collection('reminders')
-          .doc(widget.reminderId)
-          .update({'dateTime': newDateTime});
-      setState(() {
-        _dateTime = newDateTime;
-      });
-    } catch (e) {
-      print('Error updating date and time: $e');
-    }
-  }
+      Future<void> _pickImage() async {
+        final ImagePicker _picker = ImagePicker();
+        final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
 
-  Future<void> _pickDateTime() async {
-    final DateTime? date = await showDatePicker(
-      context: context,
-      initialDate: DateTime.now(),
-      firstDate: DateTime(2000),
-      lastDate: DateTime(2100),
-    );
-    if (date != null) {
-      final TimeOfDay? time = await showTimePicker(
-        context: context,
-        initialTime: TimeOfDay.now(),
-      );
-      if (time != null) {
-        DateTime newDateTime =
-            DateTime(date.year, date.month, date.day, time.hour, time.minute);
-        await _updateDateTime(newDateTime);
+        if (image != null) {
+          final Reference storageRef = _storage.ref().child('images/${image.name}');
+          final UploadTask uploadTask = storageRef.putFile(File(image.path).absolute);
+          final TaskSnapshot snapshot = await uploadTask;
+          final String downloadUrl = await snapshot.ref.getDownloadURL();
+
+          setState(() {
+            _imageFile = image;
+            _imageUrl = downloadUrl;
+          });
+        }
       }
-    }
-  }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-        resizeToAvoidBottomInset: false,
-        appBar: AppBar(
-          leading: IconButton(
-            icon: Icon(Icons.cancel),
-            onPressed: () {
-              Navigator.pop(context);
-            },
-          ),
-          title: Text(
-            widget.title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 20,
+      Future<Map<String, dynamic>> _loadReminderOptions(
+          {required String id}) async {
+        try {
+          DocumentSnapshot reminderSnapshot =
+              await _firestore.collection('reminders').doc(id).get();
+
+          if (reminderSnapshot.exists) {
+            Map<String, dynamic> data =
+                reminderSnapshot.data() as Map<String, dynamic>;
+            return data;
+          } else {
+            return {};
+          }
+        } catch (e) {
+          print('Error loading reminder options: $e');
+          return {};
+        }
+      }
+
+      Future<void> _updateDescription(String newDescription) async {
+        try {
+          await FirebaseFirestore.instance
+              .collection('reminders')
+              .doc(widget.reminderId)
+              .update({'description': newDescription});
+          setState(() {
+            widget.description = newDescription;
+          });
+        } catch (e) {
+          print('Error updating description: $e');
+        }
+      }
+
+      Future<void> _updateDateTime(DateTime newDateTime) async {
+        try {
+          await FirebaseFirestore.instance
+              .collection('reminders')
+              .doc(widget.reminderId)
+              .update({'dateTime': newDateTime});
+          setState(() {
+            _dateTime = newDateTime;
+          });
+        } catch (e) {
+          print('Error updating date and time: $e');
+        }
+      }
+
+      Future<void> _pickDateTime() async {
+        final DateTime? date = await showDatePicker(
+          context: context,
+          initialDate: DateTime.now(),
+          firstDate: DateTime(2000),
+          lastDate: DateTime(2100),
+        );
+        if (date != null) {
+          final TimeOfDay? time = await showTimePicker(
+            context: context,
+            initialTime: TimeOfDay.now(),
+          );
+          if (time != null) {
+            DateTime newDateTime =
+                DateTime(date.year, date.month, date.day, time.hour, time.minute);
+            await _updateDateTime(newDateTime);
+          }
+        }
+      }
+
+      @override
+      Widget build(BuildContext context) {
+        return Scaffold(
+            resizeToAvoidBottomInset: false,
+            appBar: AppBar(
+              leading: IconButton(
+                icon: Icon(Icons.cancel),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+              title: Text(
+                widget.title,
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
             ),
-          ),
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                SizedBox(height: 16),
-                TextField(
-                  controller: _description,
-                  maxLines: 5,
-                  decoration: InputDecoration(
-                    hintText: 'Notes',
-                    border: OutlineInputBorder(),
-                    labelText: widget.description,
-                  ),
-                ),
-                SizedBox(height: 16),
-                ListTile(
-                  leading: Icon(Icons.date_range),
-                  title: Text('Date & Time'),
-                  trailing: Icon(Icons.arrow_forward_ios),
-                  onTap: _pickDateTime,
-                ),
-                ListTile(
-                  leading: Icon(Icons.location_on),
-                  title: Text('Location'),
-                  trailing: Icon(Icons.arrow_forward_ios),
-                  onTap: () async {
-                    LocationPermission permission =
-                        await Geolocator.requestPermission();
-                    if (permission == LocationPermission.always ||
-                        permission == LocationPermission.whileInUse) {
-                      Position position = await Geolocator.getCurrentPosition(
-                          desiredAccuracy: LocationAccuracy.high);
-                      print(
-                          'Latitude: ${position.latitude}, Longitude: ${position.longitude}');
-                    } else {
-                      print('Location permission not granted.');
-                    }
-                  },
-                ),
-                ListTile(
-                  leading: Icon(Icons.priority_high),
-                  title: Text('Priority'),
-                  trailing: Icon(Icons.arrow_forward_ios),
-                  onTap: () {},
-                ),
-                ListTile(
-                  leading: Icon(Icons.camera),
-                  title: Text('Take Picture'),
-                  trailing: Icon(Icons.arrow_forward_ios),
-                  onTap: _pickImage,
-                ),
-                _imageUrl != null
-                    ? Image.network(
-                        _imageUrl!,
-                        height: 100,
-                        width: 100,
-                      )
-                    : Container(),
-                ListTile(
-                  leading: Text(
-                    'Mode',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    SizedBox(height: 16),
+                    TextField(
+                      controller: _description,
+                      maxLines: 5,
+                      decoration: InputDecoration(
+                        hintText: 'Notes',
+                        border: OutlineInputBorder(),
+                        labelText: widget.description,
+                      ),
                     ),
-                  ),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        'Reminders',
+                    SizedBox(height: 16),
+                    ListTile(
+                      leading: Icon(Icons.date_range),
+                      title: Text('Date & Time'),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: _pickDateTime,
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.location_on),
+                      title: Text('Location'),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () async {
+                        LocationPermission permission =
+                            await Geolocator.requestPermission();
+                        if (permission == LocationPermission.always ||
+                            permission == LocationPermission.whileInUse) {
+                          Position position = await Geolocator.getCurrentPosition(
+                              desiredAccuracy: LocationAccuracy.high);
+                          print(
+                              'Latitude: ${position.latitude}, Longitude: ${position.longitude}');
+                        } else {
+                          print('Location permission not granted.');
+                        }
+                      },
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.priority_high),
+                      title: Text('Priority'),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: () {},
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.camera),
+                      title: Text('Take Picture'),
+                      trailing: Icon(Icons.arrow_forward_ios),
+                      onTap: _pickImage,
+                    ),
+                    _imageUrl != null
+                        ? Image.network(
+                            _imageUrl!,
+                            height: 100,
+                            width: 100,
+                          )
+                        : Container(),
+                    ListTile(
+                      leading: Text(
+                        'Mode',
                         style: TextStyle(
-                          color: Colors.green,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Icon(Icons.arrow_forward_ios),
-                    ],
-                  ),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text(
+                            'Reminders',
+                            style: TextStyle(
+                              color: Colors.green,
+                            ),
+                          ),
+                          Icon(Icons.arrow_forward_ios),
+                        ],
+                      ),
+                    ),
+                    Align(
+                      alignment: Alignment(0.0, 0.9),
+                      child: MaterialButton(
+                        onPressed: () async {
+                          String title = widget.title.trim();
+                          String newDescription = _description.text.trim();
+                          if (newDescription.isNotEmpty) {
+                            await _updateDescription(newDescription);
+                          }
+                          if (title.isNotEmpty) {
+                            _loadReminderOptions(id: widget.reminderId);
+                          }
+                          if (_dateTime != null) {
+                            await _updateDateTime(_dateTime!);
+                          }
+                        },
+                        color: Color.fromARGB(245, 176, 67, 154),
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                        ),
+                        textColor: Color.fromARGB(255, 0, 0, 0),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        child: Text(
+                          'SAVE',
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-                Align(
-                  alignment: Alignment(0.0, 0.9),
-                  child: MaterialButton(
-                    onPressed: () async {
-                      String title = widget.title.trim();
-                      String newDescription = _description.text.trim();
-                      if (newDescription.isNotEmpty) {
-                        await _updateDescription(newDescription);
-                      }
-                      if (title.isNotEmpty) {
-                        _loadReminderOptions(id: widget.reminderId);
-                      }
-                      if (_dateTime != null) {
-                        await _updateDateTime(_dateTime!);
-                      }
-                    },
-                    color: Color.fromARGB(245, 176, 67, 154),
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.zero,
-                    ),
-                    textColor: Color.fromARGB(255, 0, 0, 0),
-                    padding: EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
-                    child: Text(
-                      'SAVE',
-                    ),
-                  ),
-                )
-              ],
-            ),
-          ),
-        ));
-  }
-}
+              ),
+            ));
+      }
+    }
+ }
