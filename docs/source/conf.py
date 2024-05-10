@@ -2,9 +2,9 @@
 
 # -- Project information
 
-project = 'Reminder App - 3c'
+project = 'Reminder App - 2C'
 copyright = ''
-author = 'Group 3C'
+author = 'Group 2C'
 
 release = '0.1'
 version = '0.1.0'
