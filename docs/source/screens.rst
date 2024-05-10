@@ -852,7 +852,7 @@ The code for the text field is below:
 
 *Icon Drop Down*
 
-This widget allows the user to choose an icon to represent the mode. This is represented by a grid in whihc the user can choose from predefined icons. The :samp:`_buildIconGrid` method arranges the icons into a grid for the user to choose from.
+This widget allows the user to choose an icon to represent the mode. This is represented by a grid in which the user can choose from predefined icons. The :samp:`_buildIconGrid` method arranges the icons into a grid for the user to choose from.
 
 Below is the code for the icon widget:
 
@@ -866,7 +866,7 @@ Below is the code for the icon widget:
     iconSize: 40
   ),
 
-Below is the code that rearanages the icons into a grid:
+Below is the code that rearranges the icons into a grid:
 
 .. code-block:: dart
 
@@ -907,15 +907,15 @@ Below is the code that rearanages the icons into a grid:
 
 *Colour Picker Drop Down*
 
-The colour picker is programed very similary to the icon picker, only using colours instead of icons. The grid is built using the :samp:`_buildColorGrid`, when the user presses on the colour picker, the grid will appear. When the user presses on one of the colours, :samp:`_selectedColor` is triggered and the colour is updated.
+The colour picker is programmed very similarly to the icon picker, only using colours instead of icons. The grid is built using the :samp:`_buildColorGrid`, when the user presses on the colour picker, the grid will appear. When the user presses on one of the colours, :samp:`_selectedColor` is triggered and the colour is updated.
 
 Below is the code for the colour widget:
 
-.. code-break:: dart
+.. code-block:: dart
 
-  void _pickColor(BuildContext context) {
-    showDialog(
-      context: context,
+    void _pickColor(BuildContext context) {
+      showDialog(
+        context: context,
         builder: (BuildContext context) {
           return Dialog(
             child: Container(
@@ -931,78 +931,76 @@ Below is the code for the colour widget:
             ),
           );
         },
-       );
+      );
     }
+
 
 Below is the code for the Colour grid:
 
-.. code-break:: dart
+.. code-block:: dart
 
-  Widget _buildColorGrid(BuildContext context) {
-    List<Color> colors = [
-      Colors.red,
-      Colors.redAccent,
-      // Long list of colours in same format.
-    ];
-
-
-  return SingleChildScrollView(
-    child: ConstrainedBox(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery
-            .of(context)
-            .size
-            .height * 0.7, // Adjust the height as needed
-       ),
-      child: GridView.builder(
-        shrinkWrap: true,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 5,
-        ),
-        itemCount: colors.length,
-        itemBuilder: (BuildContext context, int index) {
-          // Use the Color at the current index
-          Color color = colors[index];
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedColor = color; // Update the selected color
-              });
-              Navigator.of(context).pop(); // Close the dialog
-            },
-            child: Container(
-              width: 50,
-              height: 50,
-              color: color,
+    Widget _buildColorGrid(BuildContext context) {
+      List<Color> colors = [
+        Colors.red,
+        Colors.redAccent,
+        // Long list of colours in same format.
+      ];
+    
+      return SingleChildScrollView(
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery
+                .of(context)
+                .size
+                .height * 0.7, // Adjust the height as needed
+          ),
+          child: GridView.builder(
+            shrinkWrap: true,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 5,
             ),
-          );
-        },
-      ),
-    ),
-  );
-
-
-
-
-
-
+            itemCount: colors.length,
+            itemBuilder: (BuildContext context, int index) {
+              // Use the Color at the current index
+              Color color = colors[index];
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedColor = color; // Update the selected color
+                  });
+                  Navigator.of(context).pop(); // Close the dialog
+                },
+                child: Container(
+                  width: 50,
+                  height: 50,
+                  color: color,
+                ),
+              );
+            },
+          ),
+        ),
+      );
+    }
 
 *Save Widget*
 
-Depending on if the user had decided to edit a mode or create a new one, the widget will work slightly diffrently. However the first step is the same, this being validating the inputs. For it is made sure that the Mode description text field is not empty. If it is empty the user will be unable to save the mode and there will be an error message. If its not null, the program will then go on to save the mode. The function :samp:`_descriptionController` will first retrieve the Mode description, assigning it to a new 'mode' called :samp:`updatedMode` alongside the selected icon and colour. It next checks to see if :samp:`widget.mode` is null or not. If it is not null (edit mode), the existing mode (witht the same :samp:`mode.id`) will be updated using the method :samp:`_modeService.updateMode()`. If it is null, a new mode will be created using the method :samp:`_modeService.addMode()`. The screen then existits to the previous page (Mode Page) with the new, updated data, using :samp:`Navigator.pop(context, updatedMode)`.
+Depending on if the user had decided to edit a mode or create a new one, the widget will work slightly differently. However, the first step is the same, this being validating the inputs. For it is made sure that the Mode description text field is not empty. If it is empty the user will be unable to save the mode and there will be an error message. If it's not null, the program will then go on to save the mode. The function :samp:`_descriptionController` will first retrieve the Mode description, assigning it to a new 'mode' called :samp:`updatedMode` alongside the selected icon and colour. It next checks to see if :samp:`widget.mode` is null or not. If it is not null (edit mode), the existing mode (with the same :samp:`mode.id`) will be updated using the method :samp:`_modeService.updateMode()`. If it is null, a new mode will be created using the method :samp:`_modeService.addMode()`. The screen then exists to the previous page (Mode Page) with the new, updated data, using :samp:`Navigator.pop(context, updatedMode)`.
 
 The code for the save widget is below:
 
-.. code-break:: dart
+.. code-block:: dart
 
-  const SizedBox(height: 50),
-  TextButton(
-    onPressed: _saveMode,
-    child: const Text('Save Mode',
-      style: TextStyle(
-        fontSize: 20,
-        fontWeight: FontWeight.w800,
-      ),),
+    const SizedBox(height: 50),
+    TextButton(
+      onPressed: _saveMode,
+      child: const Text('Save Mode',
+        style: TextStyle(
+          fontSize: 20,
+          fontWeight: FontWeight.w800,
+        ),
+      ),
+    ),
+
 
 Code for the saving function:
 
