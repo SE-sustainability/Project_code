@@ -1,7 +1,11 @@
 Backend
 ========
 
-.. autosummary::
-   :toctree: generated
+Modes
+----
 
-   lumache
+Reminder
+--------
+
+Settings
+--------
